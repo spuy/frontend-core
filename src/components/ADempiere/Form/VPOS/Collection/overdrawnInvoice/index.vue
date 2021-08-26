@@ -162,13 +162,6 @@
           </div>
         </el-card>
       </div>
-      <el-card v-if="option === 3" class="box-card">
-        <div class="text item">
-          <type-refund
-            :is-add-type-pay="refundLoaded"
-          />
-        </div>
-      </el-card>
       <div v-if="caseOrder === 2">
         <el-card>
           <div slot="header" class="clearfix">
@@ -483,7 +476,7 @@ export default {
         tenderTypeCode: this.selectionTypeRefund.tender_type
       }
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: this.renderComponentContainer, formatReturn: 'name' })
-      if (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid)) {
+      if (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.defaultReferenceCurrency.uuid)) {
         this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
         this.$message({
           type: 'warning',
@@ -501,9 +494,18 @@ export default {
         })
       })
       this.$store.dispatch('addRefundLoaded', values)
-      this.$store.dispatch('sendCreateCustomerAccount', customer)
+      this.$store.dispatch('sendCreateCustomerAccount', {
+        posUuid: this.currentPointOfSales.uuid,
+        orderUuid: this.currentOrder.uuid,
+        bankUuid: customer.C_Bank_ID_UUID,
+        amount: this.change,
+        tenderTypeCode: this.selectionTypeRefund.tender_type,
+        currencyUuid: this.defaultReferenceCurrency.uuid
+      })
+        .then(response => {
+          this.success()
+        })
       this.selectionTypeRefund = {}
-      this.success()
     },
     success() {
       const customerDetails = []
