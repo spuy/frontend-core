@@ -129,7 +129,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.print')) : printOrder"
+                @click="printTicket"
               >
                 <i class="el-icon-printer" />
                 <br>
@@ -341,7 +341,6 @@
 import OrdersList from '@/components/ADempiere/Form/VPOS/OrderList/index'
 import ListProductPrice from '@/components/ADempiere/Form/VPOS/ProductInfo/productList'
 import {
-  printOrder,
   generateImmediateInvoice,
   withdrawal,
   createNewReturnOrder,
@@ -564,7 +563,7 @@ export default {
           this.withdrawal()
           break
         case this.$t('form.pos.optionsPoinSales.salesOrder.print'):
-          this.printOrder()
+          this.printTicket()
           break
         case this.$t('form.pos.optionsPoinSales.salesOrder.copyOrder'):
           this.copyOrder()
@@ -581,10 +580,10 @@ export default {
       event.preventDefault()
       return false
     },
-    printOrder() {
-      printOrder({
-        orderUuid: this.$route.query.action
-      })
+    printTicket() {
+      const orderUuid = this.currentOrder.uuid
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('printTicket', { posUuid, orderUuid })
     },
     generateImmediateInvoice() {
       // TODO: Add BPartner
@@ -598,6 +597,7 @@ export default {
       if (this.isEmptyValue(this.currentOrder.uuid)) {
         return ''
       }
+      const orderUuid = this.currentOrder.uuid
       const posUuid = this.currentPointOfSales.uuid
       this.$store.dispatch('updateOrderPos', true)
       this.$store.dispatch('updatePaymentPos', true)
@@ -608,7 +608,7 @@ export default {
       })
       processOrder({
         posUuid,
-        orderUuid: this.$route.query.action,
+        orderUuid,
         createPayments: false,
         payments: []
       })
@@ -619,6 +619,7 @@ export default {
             message: this.$t('notifications.completed'),
             showClose: true
           })
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
         })
         .catch(error => {
           this.$message({
@@ -675,7 +676,7 @@ export default {
     },
     createNewCustomerReturnOrder() {
       createNewReturnOrder({
-        orderUuid: this.$route.query.action
+        orderUuid: this.currentOrder.uuid
       })
     },
     showModal(action) {
