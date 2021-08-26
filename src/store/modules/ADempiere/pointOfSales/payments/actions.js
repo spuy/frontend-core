@@ -93,7 +93,7 @@ export default {
         currencyUuid: payment.currencyUuid
       })
         .then(response => {
-          const orderUuid = response.order_uuid
+          const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
         })
         .catch(error => {
@@ -214,7 +214,7 @@ export default {
         currencyUuid
       })
         .then(response => {
-          const orderUuid = response.order_uuid
+          const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
           return {
             ...response,
