@@ -22,7 +22,7 @@
       <el-popover
         v-model="showCreate"
         placement="top-start"
-        width="400"
+        width="600"
         trigger="click"
         @hide="popoverClose"
       >
@@ -60,6 +60,25 @@
         >
           <i
             class="el-icon-search"
+          />
+        </el-button>
+      </el-popover>
+      <el-popover
+        v-if="!isEmptyValue(currentOrder.businessPartner.uuid)"
+        v-model="showUpdate"
+        placement="right"
+        width="600"
+        trigger="click"
+      >
+        <business-partner-update
+          :shows-popovers="showUpdate"
+        />
+        <el-button
+          slot="reference"
+          type="text"
+        >
+          <i
+            class="el-icon-edit"
           />
         </el-button>
       </el-popover>
@@ -106,6 +125,7 @@
  */
 import { requestGetBusinessPartner } from '@/api/ADempiere/system-core.js'
 import BusinessPartnerCreate from './businessPartnerCreate'
+import BusinessPartnerUpdate from './businessPartnerUpdate'
 // import FieldListBusinessPartner from './fieldBusinessPartners/index'
 import BusinessPartnersList from './businessPartnersList'
 import BParterMixin from './mixinBusinessPartner.js'
@@ -117,7 +137,8 @@ export default {
   name: 'FieldBusinessPartner',
   components: {
     BusinessPartnerCreate,
-    BusinessPartnersList
+    BusinessPartnersList,
+    BusinessPartnerUpdate
     // FieldListBusinessPartner
   },
   props: {
@@ -145,7 +166,8 @@ export default {
       timeOut: null,
       showFieldCreate: false,
       showFieldList: false,
-      showCreate: false
+      showCreate: false,
+      visible: false
     }
   },
   computed: {
@@ -191,13 +213,31 @@ export default {
         name: undefined
       }
     },
+    currentOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+    },
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
+    },
+    showUpdateCustomer() {
+      return this.$store.getters.getShowUpdateCustomer
+    },
+    showUpdate: {
+      get() {
+        return this.$store.getters.getShowUpdateCustomer
+      },
+      set(value) {
+        this.$store.dispatch('changeShowUpdateCustomer', value)
+        return value
+      }
     }
   },
   watch: {
     popoverCreateBusinessParnet(value) {
       this.showCreate = value
+    },
+    showUpdateCustomer(value) {
+      this.visible = value
     }
   },
   methods: {

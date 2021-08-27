@@ -47,7 +47,7 @@ export default [
       tabindex: 0,
       sequence: 0,
       size: 24,
-      isMandatory: false
+      isMandatory: true
     }
   },
   {
@@ -134,7 +134,7 @@ export default [
       tabindex: 5,
       size: 24,
       sequenceFields: 'CO',
-      isMandatory: false
+      isMandatory: true
     }
   },
   {
@@ -146,7 +146,7 @@ export default [
       tabindex: 6,
       size: 24,
       sequenceFields: 'R',
-      isMandatory: false
+      isMandatory: true
     }
   },
   {
@@ -158,7 +158,7 @@ export default [
       tabindex: 7,
       size: 24,
       sequenceFields: 'C',
-      isMandatory: false
+      isMandatory: true
     }
   },
   {

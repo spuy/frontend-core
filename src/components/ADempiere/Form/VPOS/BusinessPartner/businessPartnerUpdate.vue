@@ -17,6 +17,7 @@
 -->
 <template>
   <el-main
+    v-loading="loading"
     v-shortkey="shortsKey"
     @shortkey.native="keyAction"
   >
@@ -25,7 +26,7 @@
       size="small"
       class="create-bp"
     >
-      <el-row :gutter="24">
+      <el-row>
         <el-col :span="12">
           <field-definition
             v-for="(field) in datos"
@@ -49,7 +50,7 @@
               type="primary"
               class="custom-button-create-bp"
               icon="el-icon-check"
-              @click="createBusinessParter"
+              @click="update"
             />
             <el-button
               type="danger"
@@ -65,13 +66,15 @@
 </template>
 
 <script>
-import { createCustomer } from '@/api/ADempiere/form/point-of-sales.js'
+import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import fieldsList from './fieldsListCreate.js'
+import fieldsList from './fieldListUpdate.js'
 import BParterMixin from './mixinBusinessPartner.js'
+// import { getSequenceAsList } from '@/utils/ADempiere/location'
+import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
 
 export default {
-  name: 'BusinessPartnerCreate',
+  name: 'BusinessPartnerUpdate',
   mixins: [
     formMixin,
     BParterMixin
@@ -81,13 +84,13 @@ export default {
       type: Object,
       default: () => {
         return {
-          uuid: 'Business-Partner-Create',
-          containerUuid: 'Business-Partner-Create',
+          uuid: 'Business-Partner-Update',
+          containerUuid: 'Business-Partner-Update',
           fieldsList
         }
       }
     },
-    showField: {
+    showsPopovers: {
       type: Boolean,
       default: false
     }
@@ -98,6 +101,14 @@ export default {
       isLoadingRecord: false,
       fieldsList,
       isCustomForm: true,
+      loading: true,
+      index: 0,
+      currentCustomer: {},
+      region: {
+        id: '',
+        uuid: '',
+        name: ''
+      },
       unsubscribe: () => {}
     }
   },
@@ -111,116 +122,136 @@ export default {
     datos() {
       return this.fieldsList.filter(field => field.tabindex <= 4)
     },
-    adviserPin() {
-      const value = this.$store.getters.getValueOfField({
-        containerUuid: this.containerUuid,
-        columnName: 'Value'
-      })
-      const name = this.$store.getters.getValueOfField({
-        containerUuid: this.containerUuid,
-        columnName: 'Name'
-      })
-      const isSeller = this.$store.getters.posAttributes.currentPointOfSales.isAisleSeller
-      if (!this.isEmptyValue(value) && !this.isEmptyValue(name) && isSeller) {
-        return isSeller
-      }
-      return false
+    currentBusinessPartner() {
+      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
     },
-    currentPointOfSales() {
-      return this.$store.getters.posAttributes.currentPointOfSales
+    showCustomer() {
+      return this.$store.getters.getShowUpdateCustomer
     }
   },
   watch: {
-    showField(value) {
-      if (value) {
-        setTimeout(() => {
-          this.focusValue()
-        }, 1500)
-      }
+    showCustomer(value) {
+      console.log(value)
+      this.getCustomer()
     }
   },
   beforeDestroy() {
     this.unsubscribe()
   },
   methods: {
+    requestGetCountryDefinition,
     focusValue() {
       this.$refs.Value[0].$children[0].$children[0].$children[1].$children[0].focus()
     },
-    // TODO: Get locations values.
-    createBusinessParter() {
+    update() {
       const values = this.$store.getters.getValuesView({
-        containerUuid: this.containerUuid,
+        containerUuid: 'Business-Partner-Update',
         format: 'object'
       })
-      const name2 = this.$store.getters.getValueOfField({
-        containerUuid: this.containerUuid,
-        columnName: 'Name2'
+      updateCustomer({
+        uuid: this.currentBusinessPartner.uuid,
+        value: values.Value,
+        taxId: values.TaxID,
+        name: values.Name,
+        lastName: values.Name2,
+        description: values.Description,
+        contactName: values.ContactName,
+        email: values.EMail,
+        phone: values.Phone,
+        addressUuid: this.currentCustomer.addresses[this.index].uuid,
+        address1: values.Address1,
+        address2: values.Address2,
+        address3: values.Address3,
+        address4: values.Address4,
+        cityUuid: values.C_City_ID_UUID,
+        cityName: values.DisplayColumn_C_City_ID,
+        postalCode: values.Postal,
+        regionUuid: values.C_Region_ID_UUID,
+        regionName: values.DisplayColumn_C_Region_ID,
+        countryUuid: values.C_Country_ID_UUID,
+        posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid
       })
-      values.name2 = name2
-      const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
-        containerUuid: this.containerUuid,
-        formatReturn: 'name'
+        .then(response => {
+          this.$store.dispatch('changeShowUpdateCustomer', false)
+        })
+    },
+    getCustomer() {
+      customer({
+        searchValue: this.currentBusinessPartner.value
       })
-      if (this.isEmptyValue(emptyMandatoryFields)) {
-        this.isLoadingRecord = true
-        createCustomer({
-          value: values.Value,
-          taxId: values.Value,
-          name: values.Name,
-          lastName: values.Name2,
-          description: values.Description,
-          contactName: values.ContactName,
-          email: values.EMail,
-          phone: values.Phone,
-          address1: values.Address1,
-          address2: values.Address2,
-          address3: values.Address3,
-          address4: values.Address4,
-          cityUuid: values.C_City_ID_UUID,
-          cityName: values.DisplayColumn_C_City_ID,
-          postalCode: values.Postal,
-          regionUuid: values.C_Region_ID_UUID,
-          regionName: values.DisplayColumn_C_Region_ID,
-          countryUuid: values.C_Country_ID_UUID,
-          posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid
+        .then(response => {
+          const { name, value, taxId, description, lastName, addresses } = response
+          let region = { id: '', uuid: '', name: '' }
+          let postal
+          if (!this.isEmptyValue(addresses[this.index].region)) {
+            region = addresses[this.index].region
+          }
+          if (!this.isEmptyValue(addresses[this.index].postal_code)) {
+            postal = addresses[this.index].postal_code
+          }
+          this.$store.commit('updateValuesOfContainer', {
+            containerUuid: this.containerUuid,
+            attributes: [{
+              columnName: 'TaxID',
+              value: taxId
+            }, {
+              columnName: 'Value',
+              value: value
+            }, {
+              columnName: 'Name',
+              value: name
+            }, {
+              columnName: 'Description',
+              value: description
+            }, {
+              columnName: 'Name2',
+              value: lastName
+            }, {
+              columnName: 'C_Country_ID_UUID',
+              value: undefined
+            }, {
+              columnName: 'Postal',
+              value: postal
+            }, {
+              columnName: 'C_Region_ID',
+              value: region.id
+            }, {
+              columnName: 'C_Region_ID_UUID',
+              value: region.uuid
+            }, {
+              columnName: 'DisplayColumn_C_Region_ID',
+              value: region.name
+            }, {
+              columnName: 'C_City_ID',
+              value: addresses[this.index].city.id
+            }, {
+              columnName: 'C_City_ID_UUID',
+              value: addresses[this.index].city.uuid
+            }, {
+              columnName: 'DisplayColumn_C_City_ID',
+              value: addresses[this.index].city.name
+            }, {
+              columnName: 'Address1',
+              value: addresses[this.index].address_1
+            }, {
+              columnName: 'Address2',
+              value: addresses[this.index].address_2
+            }, {
+              columnName: 'Address3',
+              value: addresses[this.index].address_3
+            }, {
+              columnName: 'Address4',
+              value: addresses[this.index].address_4
+            }]
+          })
+          this.currentCustomer = response
+          this.loading = false
         })
-          .then(responseBPartner => {
-            // TODO: Add new record into vuex store.
-            this.setBusinessPartner(responseBPartner)
-            this.clearValues()
-            this.$message({
-              type: 'success',
-              message: this.$t('form.pos.order.BusinessPartnerCreate.businessPartner'),
-              duration: 1500,
-              showClose: true
-            })
-          })
-          .catch(error => {
-            this.showsPopovers.isShowCreate = true
-            this.$message({
-              type: 'warning',
-              message: error.message + 'Name',
-              duration: 1500,
-              showClose: true
-            })
-            console.warn(`Error create Business Partner. Message: ${error.message}, code ${error.code}.`)
-          })
-          .finally(() => {
-            this.isLoadingRecord = false
-          })
-      } else {
-        this.$message({
-          type: 'warn',
-          message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
-          duration: 1500,
-          showClose: true
-        })
-      }
     },
     clearValues() {
-      this.$store.dispatch('changePopover', false)
-      this.showsPopovers.isShowCreate = false
-
+      if (this.showsPopovers) {
+        this.$store.dispatch('changeShowUpdateCustomer', false)
+      }
       this.$store.dispatch('setDefaultValues', {
         containerUuid: this.containerUuid,
         panelType: this.panelType
@@ -277,6 +308,7 @@ export default {
           value: undefined
         }]
       })
+      this.$store.dispatch('changeShowUpdateCustomer', false)
     }
   }
 }
