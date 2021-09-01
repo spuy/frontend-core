@@ -419,6 +419,7 @@ import FastOrdesList from '@/components/ADempiere/Form/VPOS/OrderList/fastOrder'
 // Format of values ( Date, Price, Quantity )
 import {
   formatDate,
+  formatDateToSend,
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
@@ -634,6 +635,9 @@ export default {
     },
     currentDocumentType() {
       if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.documentType)) {
+        if (!this.isEmptyValue(this.currentOrder.documentType)) {
+          return this.currentOrder.documentType
+        }
         return this.$store.getters.getCurrentDocumentTypePos
       }
       return {}
@@ -680,6 +684,15 @@ export default {
       } else {
         this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: value })
       }
+    },
+    orderDate(value) {
+      this.$store.state['pointOfSales/point/index'].conversionsList = []
+      this.$store.dispatch('searchConversion', {
+        conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
+        currencyFromUuid: this.currentPointOfSales.currentPriceList.currency.uuid,
+        currencyToUuid: this.currentPointOfSales.displayCurrency.uuid,
+        conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
+      })
     }
   },
   mounted() {
@@ -700,6 +713,7 @@ export default {
   },
   methods: {
     formatDate,
+    formatDateToSend,
     formatPrice,
     formatQuantity,
     keyActionClosePin(event) {

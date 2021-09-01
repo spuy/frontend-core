@@ -213,7 +213,7 @@ import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListCollection from './fieldsListCollection.js'
 import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeCollection'
-import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
+import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import { FIELDS_DECIMALS } from '@/utils/ADempiere/references'
 import overdrawnInvoice from '@/components/ADempiere/Form/VPOS/Collection/overdrawnInvoice'
@@ -437,7 +437,7 @@ export default {
         fieldsList: fieldLogic,
         isValidate: true
       })
-      if (this.defaulValuePaymentMethods.tender_type === 'X' && this.currentFieldPaymentMethods === this.defaulValuePaymentMethods.uuid) {
+      if (this.defaulValuePaymentMethods.tender_type === 'X' || this.currentFieldPaymentMethods === this.defaulValuePaymentMethods.uuid) {
         return false
       }
       if (this.isEmptyValue(fieldsEmpty)) {
@@ -670,11 +670,13 @@ export default {
     this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
   },
   methods: {
+    formatDateToSend,
     amountConvert(currency) {
       this.$store.dispatch('searchConversion', {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
         currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
-        currencyToUuid: currency.uuid
+        currencyToUuid: currency.uuid,
+        conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
       })
     },
     formatNumber({ displayType, number }) {
@@ -1014,7 +1016,8 @@ export default {
       this.$store.dispatch('searchConversion', {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
         currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
-        currencyToUuid: value
+        currencyToUuid: value,
+        conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
       })
     }
   }

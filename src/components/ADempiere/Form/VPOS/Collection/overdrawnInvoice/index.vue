@@ -199,7 +199,7 @@
 </template>
 
 <script>
-import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
+import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListOverdrawnInvoice from './fieldsListOverdrawnInvoice.js'
@@ -391,7 +391,7 @@ export default {
         return {}
       }
       const currency = this.convertionsList.filter(type => {
-        if (type.currencyTo.id === this.selectionTypeRefund.refund_reference_currency.id || this.selectionTypeRefund.refund_reference_currency.id === this.currentPointOfSales.priceList.currency.id) {
+        if (!this.isEmptyValue(type.currencyTo) && type.currencyTo.id === this.selectionTypeRefund.refund_reference_currency.id || this.selectionTypeRefund.refund_reference_currency.id === this.currentPointOfSales.priceList.currency.id) {
           return type
         }
       })
@@ -459,6 +459,7 @@ export default {
   },
   methods: {
     formatPrice,
+    formatDateToSend,
     imageCard(typeRefund) {
       let image
       switch (typeRefund) {
@@ -709,7 +710,8 @@ export default {
         this.$store.dispatch('searchConversion', {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
-          currencyToUuid: currency.uuid
+          currencyToUuid: currency.uuid,
+          conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
         })
       }
     }

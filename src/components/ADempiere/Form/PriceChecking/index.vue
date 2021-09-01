@@ -116,7 +116,7 @@
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldsList.js'
 import { getProductPrice } from '@/api/ADempiere/form/price-checking.js'
-import { formatPercent, formatPrice, formatQuantity } from '@/utils/ADempiere/valueFormat.js'
+import { formatPercent, formatPrice, formatDateToSend, formatQuantity } from '@/utils/ADempiere/valueFormat.js'
 import { getImagePath } from '@/utils/ADempiere/resource.js'
 
 export default {
@@ -163,7 +163,6 @@ export default {
         }
       })
       if (convert) {
-        console.log(convert)
         return convert
       }
       return {}
@@ -197,6 +196,7 @@ export default {
   },
   methods: {
     formatPercent,
+    formatDateToSend,
     formatPrice,
     formatQuantity,
     focusProductValue() {
@@ -220,7 +220,8 @@ export default {
         this.$store.dispatch('searchConversion', {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
-          currencyToUuid: this.currentPointOfSales.displayCurrency.uuid
+          currencyToUuid: this.currentPointOfSales.displayCurrency.uuid,
+          conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
         })
       }
     },
