@@ -43,30 +43,11 @@
                   {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
                 </b>
               </p>
-              <p class="total">
+              <p v-if="!isEmptyValue(dayRate)" class="total">
                 <b>{{ $t('form.pos.collect.dayRate') }}:</b>
                 <!-- Conversion rate to date -->
-                <b v-if="!isEmptyValue(dayRate)" style="float: right;">
-                  <span v-if="!isEmptyValue(dayRate.divideRate)">
-                    <span v-if="formatConversionCurrenty(dayRate.divideRate) > 1">
-                      {{
-                        formatPrice(formatConversionCurrenty(dayRate.divideRate), dayRate.currencyTo.iSOCode)
-                      }}
-                    </span>
-                    <span v-else>
-                      {{
-                        dayRate.currencyTo.iSOCode
-                      }}
-                      {{
-                        formatConversionCurrenty(dayRate.divideRate)
-                      }}
-                    </span>
-                  </span>
-                  <span v-else>
-                    {{
-                      formatPrice(1, currentPointOfSales.currentPriceList.currency.iSOCode)
-                    }}
-                  </span>
+                <b style="float: right;">
+                  {{ showDayRate(dayRate) }}
                 </b>
               </p>
             </div>
@@ -527,6 +508,7 @@ export default {
       return {
         currencyTo: this.currentPointOfSales.priceList.currency,
         divideRate: 1,
+        multiplyRate: 1,
         iSOCode: this.currentPointOfSales.priceList.currency.iSOCode
       }
     },
@@ -663,7 +645,7 @@ export default {
     currentFieldPaymentMethods(value) {
       const payment = this.availablePaymentMethods.find(payment => payment.uuid === value)
       if (!this.isEmptyValue(payment.refund_reference_currency)) {
-        this.currentFieldCurrency = payment.refund_reference_currency.iso_code
+        this.changeCurrency(payment.refund_reference_currency.iso_code)
       }
     },
     precision() {
@@ -679,6 +661,23 @@ export default {
   },
   methods: {
     formatDateToSend,
+    showDayRate(rate) {
+      const amount = rate.divideRate > rate.multiplyRate ? rate.divideRate : rate.multiplyRate
+      const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+      if (!this.isEmptyValue(rate.currencyTo.iSOCode) && rate.currencyTo.iSOCode !== currency.iso_code) {
+        return this.$t('form.pos.collect.emptyRate')
+      }
+      if (!this.isEmptyValue(rate.currencyTo.iSOCode) && rate.currencyTo.iSOCode === this.currentPointOfSales.priceList.currency.iSOCode) {
+        const convert = this.convertionsList.find(convert => {
+          if (!this.isEmptyValue(convert.currencyTo) && this.currentPointOfSales.displayCurrency.iso_code === convert.currencyTo.iSOCode) {
+            return convert
+          }
+        })
+        const convertAmount = !this.isEmptyValue(convert) ? (convert.divideRate > convert.multiplyRate ? convert.divideRate : convert.multiplyRate) : ''
+        return this.formatPrice(1, this.currentPointOfSales.displayCurrency.iso_code) + ' ~ ' + this.formatPrice(convertAmount, this.currentPointOfSales.priceList.currency.iSOCode)
+      }
+      return this.formatPrice(1, rate.currencyTo.iSOCode) + ' ~ ' + this.formatPrice(amount, this.currentPointOfSales.priceList.currency.iSOCode)
+    },
     amountConvert(currency) {
       this.$store.dispatch('searchConversion', {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
