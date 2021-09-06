@@ -462,6 +462,7 @@ export default {
         dayRate: 'Tasa del Día',
         noDayRate: 'No se a generado una tasa del día para la moneda',
         refund: 'Reembolso',
+        paymentMethods: 'Métodos de Pago',
         emptyRate: 'Sin tasa de conversión a la fecha',
         TenderType: {
           directDeposit: 'Depósito Directo',
