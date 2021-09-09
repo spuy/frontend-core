@@ -832,6 +832,7 @@ export default {
             })
           }).catch(() => {})
         })
+      this.$store.dispatch('changeFocusNewOrder', true)
     },
     clearOrder() {
       this.$router.push({
