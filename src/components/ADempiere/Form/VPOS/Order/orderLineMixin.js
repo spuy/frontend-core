@@ -30,50 +30,56 @@ export default {
           columnName: 'LineDescription',
           label: this.$t('form.pos.tableProduct.product'),
           isNumeric: false,
-          size: '380'
+          size: '345px'
         },
         currentPrice: {
           columnName: 'CurrentPrice',
           label: this.$t('form.productInfo.price'),
           isNumeric: true,
-          size: 'auto'
+          size: '165px'
         },
         quantityOrdered: {
           columnName: 'QtyEntered',
           label: this.$t('form.pos.tableProduct.quantity'),
           isNumeric: true,
-          size: 'auto'
+          size: '82px'
         },
         discount: {
           columnName: 'Discount',
-          label: '% ' + this.$t('form.pos.order.discount'),
+          label: this.$t('form.pos.order.discount'),
           isNumeric: true,
-          size: 'auto'
+          size: '78px'
         },
         discountTotal: {
           columnName: 'DiscountTotal',
           label: this.$t('form.pos.tableProduct.displayDiscuentAmount'),
           isNumeric: true,
-          size: 'auto'
+          size: '110px'
         },
         discounDisplayTaxAmounttTotal: {
           columnName: 'DisplayTaxAmount',
           label: this.$t('form.pos.tableProduct.displayTaxAmount'),
           isNumeric: true,
-          size: '110px'
+          size: '155px'
+        },
+        discounDisplayTaxIndicator: {
+          columnName: 'taxIndicator',
+          label: this.$t('form.pos.tableProduct.displayTaxIMP'),
+          isNumeric: true,
+          size: '60px'
         },
         grandTotal: {
           columnName: 'GrandTotal',
           label: 'Total',
           isNumeric: true,
           isVisible: true,
-          size: '110px'
+          size: 'auto'
         },
         convertedAmount: {
           columnName: 'ConvertedAmount',
           label: this.$t('form.pos.collect.convertedAmount'),
           isNumeric: true,
-          size: '110px'
+          size: 'auto'
         }
       },
       currentOrderLine: {
@@ -112,6 +118,20 @@ export default {
         return pos.isPosRequiredPin
       }
       return false
+    },
+    isShowKeyLayout() {
+      return this.$store.getters.getShowPOSKeyLayout
+    }
+  },
+  watch: {
+    isShowKeyLayout(value) {
+      if (value) {
+        this.orderLineDefinition.lineDescription.size = '140px'
+        this.orderLineDefinition.currentPrice.size = 'auto'
+      } else {
+        this.orderLineDefinition.lineDescription.size = '300px'
+        this.orderLineDefinition.currentPrice.size = '165px'
+      }
     }
   },
   methods: {
@@ -247,6 +267,8 @@ export default {
         return !this.isEmptyValue(this.currentPointOfSales.displayCurrency)
       } else if (row.columnName === 'DiscountTotal') {
         return this.currentPointOfSales.isDisplayDiscount
+      } else if (row.columnName === 'taxIndicator') {
+        return this.currentPointOfSales.isDisplayDiscount
       } else if (row.columnName === 'DisplayTaxAmount') {
         return this.currentPointOfSales.isDisplayTaxAmount
       }
@@ -270,6 +292,8 @@ export default {
         return this.formatQuantity(row.quantityOrdered)
       } else if (columnName === 'Discount') {
         return this.formatQuantity(row.discount) + '%'
+      } else if (columnName === 'taxIndicator') {
+        return this.formatQuantity(row.taxIndicator)
       } else if (columnName === 'GrandTotal') {
         return this.formatPrice(row.grandTotal, currency)
       } else if (columnName === 'ConvertedAmount') {
