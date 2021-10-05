@@ -373,7 +373,6 @@ export default {
       if (this.isEmptyValue(businessPartner)) {
         businessPartner = this.blankBPartner
       }
-
       this.setBusinessPartner(businessPartner, false)
     },
     onClose() {
