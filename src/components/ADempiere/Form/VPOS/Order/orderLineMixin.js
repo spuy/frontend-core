@@ -30,13 +30,13 @@ export default {
           columnName: 'LineDescription',
           label: this.$t('form.pos.tableProduct.product'),
           isNumeric: false,
-          size: '345px'
+          size: 'auto'
         },
         currentPrice: {
           columnName: 'CurrentPrice',
           label: this.$t('form.productInfo.price'),
           isNumeric: true,
-          size: '165px'
+          size: '120px'
         },
         quantityOrdered: {
           columnName: 'QtyEntered',
@@ -48,13 +48,13 @@ export default {
           columnName: 'Discount',
           label: this.$t('form.pos.order.discount'),
           isNumeric: true,
-          size: '78px'
+          size: '65px'
         },
         discountTotal: {
           columnName: 'DiscountTotal',
           label: this.$t('form.pos.tableProduct.displayDiscuentAmount'),
           isNumeric: true,
-          size: '110px'
+          size: '150px'
         },
         discounDisplayTaxIndicator: {
           columnName: 'taxIndicator',
@@ -66,20 +66,20 @@ export default {
           columnName: 'DisplayTaxAmount',
           label: this.$t('form.pos.tableProduct.displayTaxAmount'),
           isNumeric: true,
-          size: '155px'
+          size: '150px'
         },
         grandTotal: {
           columnName: 'GrandTotal',
           label: 'Total',
           isNumeric: true,
           isVisible: true,
-          size: 'auto'
+          size: '150px'
         },
         convertedAmount: {
           columnName: 'ConvertedAmount',
           label: this.$t('form.pos.collect.convertedAmount'),
           isNumeric: true,
-          size: 'auto'
+          size: '150px'
         }
       },
       currentOrderLine: {
@@ -131,38 +131,11 @@ export default {
   },
   watch: {
     isShowKeyLayout(value) {
-      if (value) {
-        this.orderLineDefinition.lineDescription.size = '140px'
-        this.orderLineDefinition.currentPrice.size = 'auto'
-      } else {
-        this.orderLineDefinition.lineDescription.size = '300px'
-        this.orderLineDefinition.currentPrice.size = '165px'
-      }
-    },
-    isDisplayTaxAmount(value) {
       if (!value) {
         this.orderLineDefinition.lineDescription.size = 'auto'
-        this.orderLineDefinition.convertedAmount.size = '350px'
-        this.orderLineDefinition.grandTotal.size = '350px'
       } else {
-        this.orderLineDefinition.lineDescription.size = '345px'
+        this.orderLineDefinition.lineDescription.size = '250px'
       }
-    },
-    isDisplayDiscount(value) {
-      if (!value) {
-        this.orderLineDefinition.lineDescription.size = 'auto'
-        this.orderLineDefinition.convertedAmount.size = '350px'
-        this.orderLineDefinition.grandTotal.size = '350px'
-      } else {
-        this.orderLineDefinition.lineDescription.size = '345px'
-      }
-    }
-  },
-  created() {
-    if (!this.isDisplayTaxAmount || !this.isDisplayDiscount) {
-      this.orderLineDefinition.lineDescription.size = 'auto'
-      this.orderLineDefinition.grandTotal.size = '350px'
-      this.orderLineDefinition.convertedAmount.size = '350px'
     }
   },
   methods: {
