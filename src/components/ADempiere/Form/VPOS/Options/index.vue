@@ -943,7 +943,7 @@ export default {
         columnName: 'C_DocTypeTarget_ID_UUID'
       })
       if (this.isEmptyValue(customerUuid) || id === 1000006) {
-        customerUuid = this.currentPointOfSales.templateBusinessPartner.uuid
+        customerUuid = this.currentPointOfSales.templateCustomer.uuid
       }
       this.$store.dispatch('createOrder', {
         posUuid,
@@ -981,7 +981,7 @@ export default {
       }).catch(() => {
       }).finally(() => {
         this.$store.commit('setListPayments', {})
-        const { templateBusinessPartner } = this.currentPointOfSales
+        const { templateCustomer } = this.currentPointOfSales
         this.$store.commit('updateValuesOfContainer', {
           containerUuid: this.metadata.containerUuid,
           attributes: [{
@@ -994,15 +994,15 @@ export default {
           },
           {
             columnName: 'C_BPartner_ID',
-            value: templateBusinessPartner.id
+            value: templateCustomer.id
           },
           {
             columnName: 'DisplayColumn_C_BPartner_ID',
-            value: templateBusinessPartner.name
+            value: templateCustomer.name
           },
           {
             columnName: ' C_BPartner_ID_UUID',
-            value: templateBusinessPartner.uuid
+            value: templateCustomer.uuid
           }]
         })
         this.$store.dispatch('setOrder', {
