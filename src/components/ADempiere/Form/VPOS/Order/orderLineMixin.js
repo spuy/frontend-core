@@ -58,13 +58,13 @@ export default {
         },
         discounDisplayTaxIndicator: {
           columnName: 'taxIndicator',
-          label: this.$t('form.pos.tableProduct.displayTaxIMP'),
+          label: this.$t('form.pos.tableProduct.taxRate'),
           isNumeric: true,
           size: '60px'
         },
         discounDisplayTaxAmounttTotal: {
           columnName: 'DisplayTaxAmount',
-          label: this.$t('form.pos.tableProduct.displayTaxAmount'),
+          label: this.$t('form.pos.tableProduct.taxAmount'),
           isNumeric: true,
           size: '150px'
         },
@@ -275,9 +275,6 @@ export default {
       } else if (row.columnName === 'DisplayTaxAmount') {
         return this.currentPointOfSales.isDisplayTaxAmount
       } else if (row.columnName === 'GrandTotal') {
-        if (this.isDisplayIncludingTax) {
-          this.orderLineDefinition.grandTotal.label = this.$t('form.productInfo.totalIncludingTax')
-        }
         return true
       }
       return true
@@ -299,20 +296,14 @@ export default {
       } else if (columnName === 'QtyEntered') {
         return this.formatQuantity(row.quantityOrdered)
       } else if (columnName === 'Discount') {
-        return this.formatQuantity(row.discount) + '%'
+        return this.formatQuantity(row.discount) + ' %'
       } else if (columnName === 'taxIndicator') {
         return this.formatQuantity(row.taxIndicator)
       } else if (columnName === 'GrandTotal') {
-        if (this.isDisplayIncludingTax) {
-          return this.formatPrice((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal, currency)
-        }
-        return this.formatPrice(row.grandTotal, currency)
+        return this.formatPrice((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal, currency)
       } else if (columnName === 'ConvertedAmount') {
-        if (this.isDisplayIncludingTax) {
-          const price = ((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal).toFixed(2)
-          return this.formatPrice(price / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
-        }
-        return this.formatPrice(row.grandTotal / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
+        const price = ((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal)
+        return this.formatPrice(price / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
       } else if (columnName === 'DiscountTotal') {
         return this.formatPrice((row.priceList * row.quantityOrdered) * (row.discountRate / 100), currency)
       } else if (columnName === 'DisplayTaxAmount') {
