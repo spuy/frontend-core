@@ -1002,9 +1002,9 @@ export default {
         this.completePreparedOrder(payment)
         return
       }
-      if (this.pay > this.currentOrder.grandTotal) {
+      if (this.formatPrice(this.pay) > this.formatPrice(this.currentOrder.grandTotal)) {
         this.$store.commit('dialogoInvoce', { show: true, type: 1 })
-      } else if (this.pay < this.currentOrder.grandTotal) {
+      } else if (this.formatPrice(this.pay) < this.formatPrice(this.currentOrder.grandTotal)) {
         if (this.isPosRequiredPin) {
           const attributePin = {
             payment: payment,
