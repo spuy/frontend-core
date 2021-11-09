@@ -38,6 +38,7 @@ const initStateUtils = {
   overdrawnInvoice: {
     visible: false
   },
+  searchCompleteOrders: false,
   isNewOrder: false,
   showProductList: false,
   confirmDelivery: false,
@@ -129,6 +130,9 @@ export default {
     },
     showUpdateCustomer(state, show) {
       state.updateCustomer = show
+    },
+    setShowFastCompleteOrders(state, show) {
+      state.searchCompleteOrders = show
     },
     focusNewOrder(state, payload) {
       state.isNewOrder = payload
@@ -340,6 +344,9 @@ export default {
     },
     showConfirmDelivery: (state) => {
       return state.showFastConfirmDelivery
+    },
+    getSearchCompleteOrderss: (state) => {
+      return state.searchCompleteOrders
     }
   }
 }
