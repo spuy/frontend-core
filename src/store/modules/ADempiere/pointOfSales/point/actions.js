@@ -184,7 +184,6 @@ export default {
         pos: posToSet.id
       }
     }, () => {})
-    state.currenciesList = []
     dispatch('listWarehousesFromServer', posToSet.uuid)
     dispatch('listDocumentTypesFromServer', posToSet.uuid)
     dispatch('listCurrenciesFromServer', posToSet.uuid)
