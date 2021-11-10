@@ -24,7 +24,7 @@
             <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <el-image style="width: 100px; height: 100px" :src="imageCard(value.tenderTypeCode)" fit="contain" />
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value, iSOCode(value))" fit="contain" />
                 </el-col>
                 <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
@@ -93,7 +93,7 @@
             <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <el-image style="width: 100px; height: 100px" :src="imageCard(value.tenderTypeCode)" fit="contain" />
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value)" fit="contain" />
                 </el-col>
                 <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
@@ -373,9 +373,9 @@ export default {
       }
       return require('@/image/' + image + '.jpg')
     },
-    imageCard(typePayment) {
+    imageCard(typePayment, currency) {
       let image
-      switch (typePayment) {
+      switch (typePayment.tenderTypeCode) {
         case 'D':
           image = 'MobilePayment.jpg'
           break
@@ -399,6 +399,9 @@ export default {
           break
       }
       return require('@/image/ADempiere/pos/typePayment/' + image)
+    },
+    findTypePay(value) {
+      return this.availablePaymentMethods.find(pay => pay.uuid === value.paymentMethodUuid)
     },
     deleteCollect(key) {
       const orderUuid = key.orderUuid
