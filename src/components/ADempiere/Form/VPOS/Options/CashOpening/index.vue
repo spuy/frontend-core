@@ -185,7 +185,6 @@
         style="float: right;"
         type="danger"
         icon="el-icon-close"
-        :disabled="isEmptyValue(listCastOpen)"
         @click="close()"
       />
     </el-footer>
@@ -826,6 +825,7 @@ export default {
           console.warn(`Error: ${error.message}. Code: ${error.code}.`)
         })
         .finally(() => {
+          this.clearField()
           this.listPaymentOpen()
         })
     },
@@ -929,7 +929,7 @@ export default {
         containerUuid: 'Cash-Opening',
         attributes: [{
           columnName: 'PayAmt',
-          value: undefined
+          value: 0
         }, {
           columnName: 'CollectingAgent_ID',
           value: undefined
@@ -960,6 +960,7 @@ export default {
           console.warn(`Error: ${error.message}. Code: ${error.code}.`)
         })
         .finally(() => {
+          this.clearField()
           this.listPaymentOpen()
         })
     },
