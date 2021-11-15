@@ -438,7 +438,8 @@ export default {
           title: 'Cash Management',
           cashOpening: 'Cash Opening',
           cashwithdrawal: 'Cash withdrawa',
-          closeBox: 'Close the box'
+          closeBox: 'Close the box',
+          assignSeller: 'Assign seller'
         },
         generalOptions: {
           title: 'General Options',
