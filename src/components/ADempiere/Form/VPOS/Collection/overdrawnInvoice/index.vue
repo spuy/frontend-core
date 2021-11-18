@@ -249,7 +249,7 @@ import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListOverdrawnInvoice from './fieldsListOverdrawnInvoice.js'
-import { overdrawnInvoice } from '@/api/ADempiere/form/point-of-sales.js'
+// import { overdrawnInvoice } from '@/api/ADempiere/form/point-of-sales.js'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import typeRefund from './typeRefund/index.vue'
 
@@ -652,7 +652,19 @@ export default {
     optionSelected({ posUuid, orderUuid, customerDetails, payments }) {
       switch (this.option) {
         case 1:
-          this.completePreparedOrder(posUuid, orderUuid, payments)
+          this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
+            .then(response => {
+              if (response.type === 'success') {
+                this.completePreparedOrder(posUuid, orderUuid, payments)
+                this.$store.dispatch('reloadOrder', response.uuid)
+                this.$message({
+                  type: 'success',
+                  message: this.$t('notifications.completed'),
+                  showClose: true
+                })
+                this.$store.commit('dialogoInvoce', { show: false, success: true })
+              }
+            })
           this.$store.commit('dialogoInvoce', { show: false, success: true })
           break
         case 2:
@@ -672,8 +684,7 @@ export default {
               posUuid: this.currentPointOfSales.uuid,
               tenderTypeCode: this.selectionTypeRefund.tender_type
             }
-            this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
-            if (this.selectionTypeRefund.is_pos_required_pin || this.maximumRefundAllowed <= (this.change / this.dayRate.divideRate)) {
+            if (this.selectionTypeRefund.is_pos_required_pin) {
               const attributePin = {
                 posUuid,
                 orderUuid,
@@ -690,26 +701,27 @@ export default {
               this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
                 .then(response => {
                   if (response.type === 'success') {
-                    // this.completePreparedOrder(posUuid, orderUuid, payments)
-                    overdrawnInvoice({
-                      posUuid,
-                      orderUuid,
-                      createPayments: !this.isEmptyValue(this.currentOrder.listPayments.payments),
-                      payments: this.currentOrder.listPayments.payments,
-                      customerDetails,
-                      option: this.option
+                    const { BankAccountType, A_Ident_SSN, C_Bank_ID_UUID, EMail, IsACH } = !this.isEmptyValue(this.$store.getters.getAddRefund) ? this.$store.getters.getAddRefund.customer.customerAccount : ''
+                    this.completePreparedOrder(posUuid, orderUuid, payments)
+                    this.$store.dispatch('reloadOrder', response.uuid)
+                    this.$store.dispatch('customerBankAccount', {
+                      customerUuid: this.currentOrder.businessPartner.uuid,
+                      posUuid: this.currentPointOfSales.uuid,
+                      email: EMail,
+                      socialSecurityNumber: A_Ident_SSN,
+                      name: this.currentOrder.businessPartner.name,
+                      bankAccountType: BankAccountType,
+                      bankUuid: C_Bank_ID_UUID,
+                      isAch: IsACH
                     })
                       .then(response => {
-                        if (response.type === 'success') {
-                          this.completePreparedOrder(posUuid, orderUuid, payments)
-                        }
-                        this.$store.dispatch('reloadOrder', response.uuid)
-                        this.$message({
-                          type: 'success',
-                          message: this.$t('notifications.completed'),
-                          showClose: true
-                        })
+                        this.refundAllowed(posUuid, orderUuid, payments)
                       })
+                    this.$message({
+                      type: 'success',
+                      message: this.$t('notifications.completed'),
+                      showClose: true
+                    })
                     this.$store.commit('dialogoInvoce', { show: false, success: true })
                   }
                 })
