@@ -387,12 +387,6 @@ export default {
         payments: payments
       })
         .then(response => {
-          this.$store.dispatch('reloadOrder', response.uuid)
-          this.$message({
-            type: 'success',
-            message: this.$t('notifications.completed'),
-            showClose: true
-          })
           this.$store.dispatch('printTicket', { posUuid, orderUuid })
           this.clearOrder()
           this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
