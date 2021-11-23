@@ -390,6 +390,7 @@ export default {
     pos: {
       title: 'Punto de Venta',
       priceList: 'Lista de Precio',
+      releaseOrder: 'Liberar',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
         emptyAvailablePaymentMethods: 'Este terminal no tiene configurado los metodos de pagos',

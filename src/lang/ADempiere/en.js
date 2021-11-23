@@ -414,6 +414,7 @@ export default {
     pos: {
       title: 'POS',
       priceList: 'Price List',
+      releaseOrder: 'Release It',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',
         emptyAvailablePaymentMethods: 'This terminal has no payment methods configured',
