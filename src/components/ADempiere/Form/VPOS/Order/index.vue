@@ -869,6 +869,7 @@ export default {
       })
         .then(response => {
           this.clearOrder()
+          this.$message.success(this.$t('form.pos.generalNotifications.orderReleased') + response.documentNo)
         })
         .catch(error => {
           this.$message({

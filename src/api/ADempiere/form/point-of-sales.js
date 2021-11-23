@@ -1251,7 +1251,7 @@ export function releaseOrder({
     }
   })
     .then(response => {
-      return response
+      return camelizeObjectKeys(response)
     })
 }
 
@@ -1270,6 +1270,6 @@ export function holdOrder({
     }
   })
     .then(response => {
-      return response
+      return camelizeObjectKeys(response)
     })
 }

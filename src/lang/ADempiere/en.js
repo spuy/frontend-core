@@ -456,6 +456,9 @@ export default {
           dateFrom: 'Date From'
         }
       },
+      generalNotifications: {
+        orderReleased: 'Order was released: '
+      },
       tableProduct: {
         product: 'Product',
         quantity: 'Quantity',

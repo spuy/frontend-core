@@ -432,6 +432,9 @@ export default {
           dateFrom: 'Fecha Desde'
         }
       },
+      generalNotifications: {
+        orderReleased: 'Orden Liberada: '
+      },
       tableProduct: {
         product: 'Producto',
         quantity: 'Cantidad',
