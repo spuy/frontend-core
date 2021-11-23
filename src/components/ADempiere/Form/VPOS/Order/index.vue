@@ -868,7 +868,7 @@ export default {
         orderUuid: this.currentOrder.uuid
       })
         .then(response => {
-          console.log({ response })
+          this.clearOrder()
         })
         .catch(error => {
           this.$message({

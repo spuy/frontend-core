@@ -1242,6 +1242,25 @@ export function releaseOrder({
   orderUuid
 }) {
   return request({
+    url: `${config.pointOfSales.endpoint}/release-order`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      sales_representative_uuid: salesRepresentativeUuid,
+      order_uuid: orderUuid
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+export function holdOrder({
+  posUuid,
+  salesRepresentativeUuid,
+  orderUuid
+}) {
+  return request({
     url: `${config.pointOfSales.endpoint}/hold-order`,
     method: 'post',
     data: {
