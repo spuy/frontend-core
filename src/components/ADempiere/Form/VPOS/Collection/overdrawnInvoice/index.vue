@@ -781,6 +781,7 @@ export default {
         payments: payments
       })
         .then(response => {
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
           this.$store.dispatch('reloadOrder', response.uuid)
           this.$message({
             type: 'success',

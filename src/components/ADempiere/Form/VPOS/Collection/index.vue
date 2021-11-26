@@ -1042,13 +1042,13 @@ export default {
         payments: payment
       })
         .then(response => {
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
           this.$store.dispatch('reloadOrder', response.uuid)
           this.$message({
             type: 'success',
             message: this.$t('notifications.completed'),
             showClose: true
           })
-          this.$store.dispatch('printTicket', { posUuid, orderUuid })
           this.newOrderAfterPrintTicket()
         })
         .catch(error => {
