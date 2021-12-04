@@ -239,7 +239,9 @@ export default {
       visible: false,
       selectAddress: '',
       labelAddress: '',
-      visibleAddress: false
+      visibleAddress: false,
+      customerValue: '',
+      selectCustomerValue: ''
     }
   },
   computed: {
@@ -280,10 +282,13 @@ export default {
           // DisplayColumn_'ColumnName'
           columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.displayColumnName
         })
-        if (this.isEmptyValue(this.selectAddress)) {
-          return display
+        if (display === undefined) {
+          return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer.name
         }
-        return display + '-' + this.selectAddress.first_name
+        if (this.isEmptyValue(this.selectAddress)) {
+          return this.customerValue + display
+        }
+        return this.customerValue + '-' + display + '-' + this.selectAddress.first_name
       },
       set(value) {
         this.$store.commit('updateValueOfField', {
@@ -357,6 +362,9 @@ export default {
         return value
       }
     },
+    updatedCustomerValue() {
+      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner.value
+    },
     copyShippingAddress() {
       return this.$store.getters.getCopyShippingAddress
     }
@@ -390,6 +398,11 @@ export default {
     },
     showUpdateCustomer(value) {
       this.visible = value
+    },
+    updatedCustomerValue(value) {
+      if (!this.isEmptyValue(value)) {
+        this.customerValue = value
+      }
     }
   },
   methods: {
@@ -405,12 +418,14 @@ export default {
       this.labelAddress = address
     },
     setNewDisplayedValue() {
+      this.customerValue = ''
       const displayValue = this.displayedValue
       if (this.controlDisplayed !== displayValue) {
         this.controlDisplayed = displayValue
       }
     },
     setOldDisplayedValue() {
+      this.customerValue = this.selectCustomerValue
       if (this.controlDisplayed !== this.displayedValue) {
         this.displayedValue = this.controlDisplayed
       }
@@ -489,7 +504,8 @@ export default {
       if (this.isEmptyValue(businessPartner)) {
         businessPartner = this.blankBPartner
       }
-      businessPartner.name = businessPartner.value + '-' + businessPartner.name
+      this.customerValue = businessPartner.value
+      this.selectCustomerValue = businessPartner.value
       this.setBusinessPartner(businessPartner, false)
     },
     onClose() {
