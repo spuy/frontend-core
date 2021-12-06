@@ -395,7 +395,10 @@ export default {
           value: customer.lastName
         }, {
           columnName: 'EMail',
-          value: customer.addresses[0].email
+          value: this.isEmptyValue(customer.addresses) ? '' : customer.addresses[0].email
+        }, {
+          columnName: 'Phone',
+          value: this.isEmptyValue(customer.addresses) ? '' : customer.addresses[0].phone
         }, {
           columnName: 'Value',
           value: customer.value
