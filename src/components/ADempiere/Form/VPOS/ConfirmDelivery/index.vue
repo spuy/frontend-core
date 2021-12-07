@@ -445,6 +445,16 @@ export default {
             showClose: true
           })
         }
+        const suggestionOpen = results.length
+        if (this.isEmptyValue(queryString) || queryString.length < 4) {
+          // not show list
+          callBack(results)
+          return
+        }
+        if (suggestionOpen <= 1) {
+          this.searchProduct(results[0])
+          this.$refs.searchValue.close()
+        }
         callBack(results)
       }, 500)
     },
