@@ -764,7 +764,7 @@ export default {
       const refund = this.convertValuesToSend(values)
       const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', fieldsList: fieldLogic, isValidate: true, formatReturn: 'name' })
-      if (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.refundReferenceCurrency)) {
+      if (!this.isEmptyValue(this.fieldLogic) && !this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.refundReferenceCurrency)) {
         this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
         this.$message({
           type: 'warning',
@@ -798,6 +798,12 @@ export default {
         })
         return
       }
+      let account = this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+      if (this.isEmptyValue(refund.AccountNo) && payment.tender_type === 'Z') {
+        account = refund.email
+      } else if (this.isEmptyValue(refund.AccountNo) && payment.tender_type === 'P') {
+        account = refund.phone
+      }
       const currencySelected = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
       if (this.isEmptyValue(this.currentBankAccount)) {
         this.$store.dispatch('customerBankAccount', {
@@ -807,12 +813,12 @@ export default {
           email: refund.email,
           driverLicense: value,
           socialSecurityNumber: value,
-          name: this.isEmptyValue(nameAccount) ? this.currentOrder.businessPartner.name + this.currentPaymentMethods : nameAccount + this.currentPaymentMethods,
+          name: this.isEmptyValue(nameAccount) ? this.currentOrder.businessPartner.name + '-' + this.currentPaymentMethods : nameAccount + '-' + this.currentPaymentMethods,
           bankAccountType: refund.bankAccountType,
           bankUuid: refund.bankUuid,
           paymentMethodUuid: payment.uuid,
           isAch: true,
-          AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+          AccountNo: account
         })
           .then(response => {
             this.$store.dispatch('refundReference', {
@@ -830,7 +836,7 @@ export default {
               bankUuid: refund.bankID,
               paymentMethodUuid: payment.uuid,
               isAch: true,
-              AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+              AccountNo: account
             })
           })
         this.clearAccountData()
@@ -851,7 +857,7 @@ export default {
         bankUuid: refund.bankAccountType,
         paymentMethodUuid: payment.uuid,
         isAch: true,
-        AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+        AccountNo: account
       })
       this.clearAccountData()
       return
@@ -1161,13 +1167,6 @@ export default {
         containerUuid: this.renderComponentContainer,
         format: 'object'
       })
-      const customer = {
-        customerAccount: values,
-        currencyUuid: this.$store.getters.getCurrencyRedund.uuid,
-        orderUuid: this.currentOrder.uuid,
-        posUuid: this.currentPointOfSales.uuid,
-        tenderTypeCode: this.selectionTypeRefund.tender_type
-      }
       const posUuid = this.currentPointOfSales.uuid
       const orderUuid = this.currentOrder.uuid
       const payments = this.currentOrder.listPayments.payments
@@ -1188,19 +1187,7 @@ export default {
         this.success()
         return
       }
-      this.$store.dispatch('addCreateCustomerAccount', {
-        posUuid,
-        customer,
-        orderUuid,
-        bankUuid: customer.C_Bank_ID_UUID,
-        amount: this.round(this.change / this.dayRate.divideRate, this.defaultReferenceCurrency.standard_precision),
-        tenderTypeCode: this.selectionTypeRefund.tender_type,
-        paymentMethodUuid: this.selectionTypeRefund.uuid,
-        currencyUuid: this.defaultReferenceCurrency.uuid
-      })
-        .then(response => {
-          this.success()
-        })
+      this.success()
     },
     success() {
       const customerDetails = []
@@ -1313,18 +1300,13 @@ export default {
               this.visible = true
               this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
             } else {
-              this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
-                .then(response => {
-                  if (response.type === 'success') {
-                    this.completePreparedOrder(posUuid, orderUuid, payments)
-                    this.$message({
-                      type: 'success',
-                      message: this.$t('notifications.completed'),
-                      showClose: true
-                    })
-                    this.$store.commit('dialogoInvoce', { show: false, success: true })
-                  }
-                })
+              this.completePreparedOrder(posUuid, orderUuid, payments)
+              this.$message({
+                type: 'success',
+                message: this.$t('notifications.completed'),
+                showClose: true
+              })
+              this.$store.commit('dialogoInvoce', { show: false, success: true })
             }
           } else {
             this.$message({
