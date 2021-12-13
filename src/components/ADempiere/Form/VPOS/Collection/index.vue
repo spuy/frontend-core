@@ -624,6 +624,18 @@ export default {
         return 12
       }
       return 24 / size
+    },
+    amountForTheRate() {
+      const amount = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+      const convert = this.convertionsList.find(convert => {
+        if (!this.isEmptyValue(amount) && !this.isEmptyValue(convert.currencyTo) && amount.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== amount.id) {
+          return convert
+        }
+      })
+      if (!this.isEmptyValue(convert) && this.currentPointOfSales.currentPriceList.currency.id !== amount.id) {
+        return convert.divideRate
+      }
+      return 1
     }
   },
   watch: {
@@ -641,7 +653,7 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        value: this.round(value, this.standardPrecision)
+        value: this.currentOrder.openAmount / this.amountForTheRate
       })
     },
     convertAllPayment(value) {
@@ -655,7 +667,7 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       }
     },
@@ -664,13 +676,13 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending / value.divideRate, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       } else {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       }
     },
@@ -725,7 +737,7 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       }
     }, 1500)
@@ -892,7 +904,7 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       })
       this.defaultValueCurrency()
@@ -922,7 +934,7 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
+        value: this.currentOrder.openAmount / this.amountForTheRate
       })
       this.defaultValueCurrency()
       this.$store.commit('currencyDivideRateCollection', 1)
