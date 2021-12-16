@@ -475,7 +475,7 @@ export default {
     listOrdersInvoiced(option) {
       this.isloading = true
       const values = {
-        ...option.params,
+        ...this.currentOptions.params,
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         documentNo: this.input,
         pageToken: this.tokenPage,
