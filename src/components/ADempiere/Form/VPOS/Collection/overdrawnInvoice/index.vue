@@ -277,31 +277,6 @@
             :currency="pointOfSalesCurrency"
             :size="6"
           />
-          <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + $t('form.pos.collect.overdrawnInvoice.amountChange')" width="40%" :visible.sync="visiblePin" :append-to-body="true">
-            <el-input
-              id="pin"
-              ref="pinPostPayment"
-              v-model="pinPostPayment"
-              v-shortkey="visiblePin ? {close: ['esc'], enter: ['enter']} : {}"
-              autofocus
-              type="password"
-              :placeholder="$t('form.pos.tableProduct.pin')"
-              :focus="true"
-              @shortkey.native="theActionPin"
-            />
-            <span style="float: right;">
-              <el-button
-                type="danger"
-                icon="el-icon-close"
-                @click="closePinPayment()"
-              />
-              <el-button
-                type="primary"
-                icon="el-icon-check"
-                @click="openPinPayment(pin)"
-              />
-            </span>
-          </el-dialog>
         </el-card>
       </div>
       <div v-if="caseOrder === 2">
@@ -322,6 +297,31 @@
           </el-form>
         </el-card>
       </div>
+      <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + $t('form.pos.collect.overdrawnInvoice.amountLimitOrder')" width="40%" :visible.sync="visiblePin" :append-to-body="true">
+        <el-input
+          id="pin"
+          ref="pinPostPayment"
+          v-model="pinPostPayment"
+          v-shortkey="visiblePin ? {close: ['esc'], enter: ['enter']} : {}"
+          autofocus
+          type="password"
+          :placeholder="$t('form.pos.tableProduct.pin')"
+          :focus="true"
+          @shortkey.native="theActionPin"
+        />
+        <span style="float: right;">
+          <el-button
+            type="danger"
+            icon="el-icon-close"
+            @click="closePinPayment()"
+          />
+          <el-button
+            type="primary"
+            icon="el-icon-check"
+            @click="openPinPayment(pin)"
+          />
+        </span>
+      </el-dialog>
       <span slot="footer" class="dialog-footer">
         <el-button
           type="danger"
@@ -403,15 +403,16 @@ export default {
       currentPaymentType: '',
       visiblePin: false,
       pinPostPayment: '',
+      refundOptionVAlidate: {},
       currentBankAccount: ''
     }
   },
   computed: {
     validateOverdrawnInvoice() {
       if (this.option === 1) {
-        return this.isEmptyValue(this.listPaymentsRefund)
+        return this.isEmptyValue(this.listRefund)
       } else if (this.option === 3) {
-        return this.isEmptyValue(this.listRefundsReference)
+        return this.isEmptyValue(this.listRefund)
       }
       return false
     },
@@ -707,9 +708,19 @@ export default {
       if (value === 3) {
         this.$store.dispatch('listCustomerBankAccounts', { customerUuid: this.currentOrder.businessPartner.uuid })
       }
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'OverdrawnInvoice',
+        columnName: 'PayAmt',
+        value: this.refundAmount / this.dayRate.divideRate
+      })
     },
     showDialogo(value) {
       if (value) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'OverdrawnInvoice',
+          columnName: 'PayAmt',
+          value: this.refundAmount / this.dayRate.divideRate
+        })
         if (this.option === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
           this.selectPayment(this.paymentTypeListRefund[0])
         }
@@ -922,7 +933,7 @@ export default {
     openPinPayment(pin) {
       validatePin({
         posUuid: this.currentPointOfSales.uuid,
-        pin
+        pin: this.pinPostPayment
       })
         .then(response => {
           this.pinPostPayment = ''
@@ -932,7 +943,11 @@ export default {
             message: 'Acción a realizar',
             showClose: true
           })
-          this.addPostPayment()
+          if (!this.isEmptyValue(this.refundOptionVAlidate)) {
+            this.$store.dispatch('sendCreateCustomerAccount', this.refundOptionVAlidate)
+          } else {
+            this.addPostPayment()
+          }
         })
         .catch(error => {
           console.error(error.message)
@@ -946,10 +961,12 @@ export default {
         .finally(() => {
           this.visiblePin = false
           this.pinPostPayment = ''
+          this.refundOptionVAlidate = {}
         })
     },
     closePinPayment() {
       this.visiblePin = false
+      this.refundOptionVAlidate = {}
       this.pinPostPayment = ''
     },
     selectedBanckAccount(value) {
@@ -1172,12 +1189,22 @@ export default {
         return
       }
       if (this.maximumRefundAllowed < amount || (this.maximumRefundAllowed - allPayMaximunRefund) < amount) {
-        this.$message({
-          type: 'warning',
-          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
-          duration: 1500,
-          showClose: true
-        })
+        this.visiblePin = true
+        setTimeout(() => {
+          this.$refs.pinPostPayment.focus()
+        }, 500)
+        this.refundOptionVAlidate = {
+          posUuid,
+          orderUuid,
+          bankUuid,
+          referenceNo,
+          amount: amount,
+          convertedAmount: amount * this.dayRate.divideRate,
+          paymentDate,
+          tenderTypeCode,
+          paymentMethodUuid,
+          currencyUuid
+        }
         return
       }
       this.$store.dispatch('sendCreateCustomerAccount', {

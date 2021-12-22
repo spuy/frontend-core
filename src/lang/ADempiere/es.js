@@ -531,6 +531,7 @@ export default {
           emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
           amountChange: 'Monto superior al cambio',
+          amountLimitOrder: 'Monto Superior al Límite de la Orden',
           incompleteChange: 'Cambio Incompleto',
           fieldList: {
             code: 'Cedula',
@@ -541,10 +542,10 @@ export default {
         }
       },
       keyLayout: {
-        noProducto: 'No hay producto disponible Regresar al Principio'
+        noProducto: 'Producto no Disponible'
       },
       pinMessage: {
-        pin: 'Ingrese pin para ',
+        pin: 'Ingrese Pin para ',
         documentType: 'cambiar tipo de documento',
         warehouse: 'cambiar almacén',
         price: 'cambiar precio',
