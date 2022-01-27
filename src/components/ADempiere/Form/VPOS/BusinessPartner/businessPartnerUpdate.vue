@@ -15,10 +15,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-main
     v-loading="loading"
-    v-shortkey="showCustomer ? {close: ['esc'], enter: ['enter']} : {}"
+    v-shortkey="showCustomer ? { close: ['esc'], enter: ['enter'] } : {}"
     @shortkey.native="actionUpdate"
   >
     <el-form
@@ -97,10 +98,18 @@
                       {{ labelDirecction(address) }}
                     </el-tag>
                   </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.region')"> {{ labelAddress(address.region) }} </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.city')"> {{ labelAddress(address.city) }} </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.address')"> {{ address.address_1 }} </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.postCode')"> {{ address.postal_code }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.region')">
+                    {{ labelAddress(address.region) }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.city')">
+                    {{ labelAddress(address.city) }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.address')">
+                    {{ address.address_1 }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.postCode')">
+                    {{ address.postal_code }}
+                  </el-descriptions-item>
                 </el-descriptions>
               </el-scrollbar>
             </el-card>
@@ -128,7 +137,7 @@
     </el-form>
     <el-dialog
       :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
-      :visible.sync="epale"
+      :visible.sync="isShowModal"
       :show-close="true"
       :append-to-body="true"
       :modal-append-to-body="true"
@@ -200,6 +209,7 @@ export default {
       isCustomForm: true,
       loading: true,
       index: 0,
+      isShowModal: false,
       isShowEditAddress: false,
       addressUpdate: {},
       currentCustomer: {},
@@ -307,7 +317,7 @@ export default {
   methods: {
     requestGetCountryDefinition,
     closePanelAddress() {
-      this.epale = false
+      this.isShowModal = false
       this.showPanelAddress = false
     },
     actionUpdate(commands) {
