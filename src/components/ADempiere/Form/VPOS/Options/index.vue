@@ -247,6 +247,43 @@
               </el-popover>
             </el-card>
           </el-col>
+          <el-col v-if="isDisplayCount" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover" style="height: 100px">
+              <el-popover
+                v-model="showCount"
+                width="350"
+                :title="$t('form.pos.discountRate')"
+                placement="top"
+              >
+                <div style="padding: 20px;">
+                  <el-input-number v-model="count" :min="0" :controls="false" :max="100" style="width: auto;" />
+                  <div style="text-align: right; margin: 0">
+                    <el-button
+                      type="danger"
+                      class="custom-button-create-bp"
+                      icon="el-icon-close"
+                      @click="showCount = false"
+                    />
+                    <el-button
+                      type="primary"
+                      class="custom-button-create-bp"
+                      icon="el-icon-check"
+                      @click="addCount(count)"
+                    />
+                  </div>
+                </div>
+                <el-button
+                  slot="reference"
+                  type="text"
+                  style="min-height: 50px;width: -webkit-fill-available;white-space: normal;"
+                >
+                  <i class="el-icon-document-remove" />
+                  <br>
+                  {{ $t('form.pos.applyDiscountOnOrder') }}
+                </el-button>
+              </el-popover>
+            </el-card>
+          </el-col>
         </el-row>
       </el-collapse-item>
 
@@ -436,6 +473,8 @@ export default {
       attributePin: {},
       validatePin: true,
       visible: false,
+      showCount: false,
+      count: 0,
       visibleReverse: false,
       isLoadingReverse: false,
       showFieldListOrder: false,
@@ -459,6 +498,9 @@ export default {
     },
     allowsConfirmShipment() {
       return this.currentPointOfSales.isAllowsConfirmShipment
+    },
+    isDisplayCount() {
+      return this.currentPointOfSales.isDisplayDiscount
     },
     infowOverdrawnInvoice() {
       if (this.$store.getters.getOverdrawnInvoice.attributePin) {
@@ -893,6 +935,14 @@ export default {
           this.$store.commit('setShowPOSOptions', false)
           this.newOrder()
         })
+    },
+    addCount(count) {
+      this.$store.dispatch('updateOrder', {
+        orderUuid: this.currentOrder.uuid,
+        posUuid: this.currentPointOfSales.uuid,
+        count
+      })
+      this.showCount = false
     },
     seeOrderList() {
       if (this.ordersList.recordCount <= 0) {
