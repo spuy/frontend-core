@@ -68,33 +68,11 @@
                 >
                   Editar
                 </el-button>
-                <!--<el-popover
-                  v-model="showPanelAddress"
-                  placement="left-start"
-                  :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
-                  width="600"
-                  trigger="click"
-                >
-                  {{ address.first_name }}
-                  <add-address
-                    :is-updated-address="showAddressUpdate"
-                    :address-to-update="addressUpdate"
-                    :shows-popovers="showAddressUpdate"
-                  />
-                  <el-button
-                    slot="reference"
-                    style="float: right; padding: 3px 0"
-                    type="text"
-                    @click="openEditAddress(address)"
-                  >
-                    Editar
-                  </el-button>
-                </el-popover>-->
               </div>
               <el-scrollbar wrap-class="scroll-customer-description">
                 <el-descriptions class="margin-top" :title="$t('form.pos.order.BusinessPartnerCreate.address.managementDescription')" :column="1">
                   <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.addressType')">
-                    <el-tag size="small" :type="address.is_default_billing ? 'success' : ''">
+                    <el-tag size="small" :type="typeTag(address)">
                       {{ labelDirecction(address) }}
                     </el-tag>
                   </el-descriptions-item>
@@ -470,7 +448,7 @@ export default {
           value: this.isEmptyValue(customer.addresses) ? '' : customer.addresses[0].email
         }, {
           columnName: 'Phone',
-          value: this.isEmptyValue(customer.addresses) ? '' : this.isEmptyValue(customer.addresses[0].phone) ? customer.addresses[1].phone : customer.addresses[0].phone
+          value: this.isEmptyValue(customer.addresses) ? '' : this.isEmptyValue(customer.addresses[0].phone) ? (this.isEmptyValue(customer.addresses[1]) ? '' : customer.addresses[1].phone) : customer.addresses[0].phone
         }, {
           columnName: 'Value',
           value: customer.value
@@ -569,7 +547,15 @@ export default {
       } else if (value.is_default_shipping) {
         return this.$t('form.pos.order.BusinessPartnerCreate.shippingAddress')
       }
-      return ''
+      return this.$t('form.pos.order.BusinessPartnerCreate.withoutSetting')
+    },
+    typeTag(value) {
+      if (value.is_default_billing) {
+        return 'success'
+      } else if (value.is_default_shipping) {
+        return ''
+      }
+      return 'warning'
     },
     labelAddress(address) {
       if (!this.isEmptyValue(address) && !this.isEmptyValue(address.name)) {
