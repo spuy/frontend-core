@@ -454,6 +454,9 @@ export default {
     },
     showUpdate: {
       get() {
+        if (!this.$store.getters.getShowUpdateCustomer && this.$store.getters.getShowAddressUpdate) {
+          return true
+        }
         return this.$store.getters.getShowUpdateCustomer
       },
       set(value) {
