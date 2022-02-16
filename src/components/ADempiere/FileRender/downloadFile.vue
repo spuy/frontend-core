@@ -15,7 +15,6 @@
 -->
 
 <template>
-  <!-- actions or process on container -->
   <el-dropdown
     style="margin:0 0 10px 20px;"
     :hide-on-click="true"
@@ -137,23 +136,3 @@ export default defineComponent({
 
 })
 </script>
-
-<style lang="scss" scoped>
-.html-content {
-  width: 100%;
-  height: inherit;
-  padding-left: 10px;
-  padding-right: 10px;
-
-  .sub-content-html {
-    min-height: inherit;
-    height: inherit;
-    max-height: -webkit-max-content;
-    max-height: -moz-max-content;
-    max-height: max-content;
-    width: 100%;
-    padding-bottom: 4%;
-  }
-
-}
-</style>
