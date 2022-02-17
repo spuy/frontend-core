@@ -677,6 +677,9 @@ export default {
         return convert.divideRate
       }
       return 1
+    },
+    showCollection() {
+      return this.$store.getters.getShowCollectionPos
     }
   },
 
@@ -690,6 +693,11 @@ export default {
           conversionDate: clientDateTime(value, 'd')
         })
       }
+    },
+    showCollection(value) {
+      this.defaultValueCurrency()
+      this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
+      this.cancel()
     },
     pending(value) {
       this.$store.commit('updateValueOfField', {
@@ -1156,6 +1164,7 @@ export default {
     },
     changePaymentMethods(value) {
       this.currentFieldPaymentMethods = value
+      this.clearCollection()
     },
     changeCurrency(value) {
       this.currentFieldCurrency = value
@@ -1175,6 +1184,69 @@ export default {
         currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
         currencyToUuid: value,
         conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
+      })
+    },
+    clearCollection() {
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid: 'Collection',
+        attributes: [
+          {
+            columnName: 'Description',
+            value: undefined
+          },
+          {
+            columnName: 'EMail',
+            value: undefined
+          },
+          {
+            columnName: 'ReferenceNo',
+            value: undefined
+          },
+          {
+            columnName: 'DocumentNo',
+            value: undefined
+          },
+          {
+            columnName: 'AccountNo',
+            value: undefined
+          },
+          {
+            columnName: 'C_Bank_ID',
+            value: undefined
+          },
+          {
+            columnName: 'C_Bank_ID_UUID',
+            value: undefined
+          },
+          {
+            columnName: 'DisplayColumn_C_Bank_ID',
+            value: undefined
+          },
+          {
+            columnName: 'CreditCardNumber',
+            value: undefined
+          },
+          {
+            columnName: 'CreditCardType',
+            value: undefined
+          },
+          {
+            columnName: 'DisplayColumn_CreditCardType',
+            value: undefined
+          },
+          {
+            columnName: 'DisplayColumn_TenderType',
+            value: undefined
+          },
+          {
+            columnName: 'DisplayColumn_WH_Type_ID',
+            value: undefined
+          },
+          {
+            columnName: 'WH_Type_ID',
+            value: undefined
+          }
+        ]
       })
     }
   }
