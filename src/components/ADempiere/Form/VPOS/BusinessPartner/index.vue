@@ -586,7 +586,7 @@ export default {
         containerUuid: 'Business-Partner-Create',
         formatReturn: 'name'
       })
-      values.additionalAttribute = [
+      values.additionalAttributes = [
         {
           key: 'IsTaxpayer',
           value: this.$store.getters.getValueOfField({
@@ -604,7 +604,7 @@ export default {
       ]
       if (this.isEmptyValue(emptyMandatoryFields)) {
         this.isLoadingRecord = true
-        const { value, taxId, duns, naics, name, lastName, description, addresses, phone, posUuid, additionalAttribute } = values
+        const { value, taxId, duns, naics, name, lastName, description, addresses, phone, posUuid, additionalAttributes } = values
         createCustomer({
           value,
           taxId,
@@ -613,7 +613,7 @@ export default {
           name,
           lastName,
           description,
-          additionalAttribute,
+          additionalAttributes,
           addresses,
           phone,
           posUuid
