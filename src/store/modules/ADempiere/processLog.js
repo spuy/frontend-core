@@ -14,11 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import Vue from 'vue'
+import language from '@/lang'
+
+// api request methods
 import {
   requestListProcessesLogs
 } from '@/api/ADempiere/process.js'
+
+// utils and helper methods
 import { showNotification } from '@/utils/ADempiere/notification.js'
-import language from '@/lang'
 
 /**
  * Process Vuex Module
@@ -27,22 +32,22 @@ import language from '@/lang'
 const processLog = {
   state: {
     sessionProcess: [],
-    inRequestMetadata: []
+    inRequestMetadata: {}
   },
 
   mutations: {
-    setSessionProcess(state, payload) {
-      state.sessionProcess = payload.processList
+    setSessionProcess(state, processList) {
+      state.sessionProcess = processList
     },
 
     // Add process in request metadata from server
-    addInRequestMetadata(state, payload) {
-      state.inRequestMetadata.push(payload)
+    addInRequestMetadata(state, containerUuid) {
+      Vue.set(state.inRequestMetadata, containerUuid, true)
     },
 
     // Delete process in request metadata
-    deleteInRequestMetadata(state, payload) {
-      state.inRequestMetadata = state.inRequestMetadata.filter(item => item !== payload)
+    deleteInRequestMetadata(state, containerUuid) {
+      Vue.set(state.inRequestMetadata, containerUuid, undefined)
     }
   },
 
@@ -58,27 +63,24 @@ const processLog = {
       pageSize
     }) {
       // process Activity
-      return requestListProcessesLogs({ pageToken, pageSize })
-        .then(processActivityResponse => {
-          const responseList = processActivityResponse.processLogsList
+      return new Promise(resolve => {
+        requestListProcessesLogs({ pageToken, pageSize })
+          .then(async processActivityResponse => {
+            const { processLogsList } = processActivityResponse
 
-          const processResponseList = {
-            recordCount: processActivityResponse.recordCount,
-            processList: responseList,
-            nextPageToken: processActivityResponse.nextPageToken
-          }
-          commit('setSessionProcess', processResponseList)
+            commit('setSessionProcess', processLogsList)
 
-          return processResponseList
-        })
-        .catch(error => {
-          showNotification({
-            title: language.t('notifications.error'),
-            message: error.message,
-            type: 'error'
+            resolve(processLogsList)
           })
-          console.warn(`Error getting process activity: ${error.message}. Code: ${error.code}.`)
-        })
+          .catch(error => {
+            console.warn(`Error getting process activity: ${error.message}. Code: ${error.code}.`)
+            showNotification({
+              title: language.t('notifications.error'),
+              message: error.message,
+              type: 'error'
+            })
+          })
+      })
     }
   },
 
@@ -87,7 +89,7 @@ const processLog = {
      * Process request metadata from server filter form uuid process
      */
     getInRequestMetadata: (state) => (containerUuid) => {
-      return state.inRequestMetadata.find(item => item === containerUuid)
+      return state.inRequestMetadata[containerUuid]
     },
 
     /**
