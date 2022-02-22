@@ -468,6 +468,12 @@ export default {
         }, {
           columnName: 'TaxID',
           value: customer.value
+        }, {
+          columnName: 'PersonType_ID',
+          value: this.isEmptyValue(customer.additionalAttributes) ? '' : customer.additionalAttributes.PersonType
+        }, {
+          columnName: 'IsTaxpayer',
+          value: this.isEmptyValue(customer.additionalAttributes) ? false : customer.additionalAttributes.IsTaxpayer
         }]
       })
     },
