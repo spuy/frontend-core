@@ -16,7 +16,7 @@
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <el-container style="background: white; height: 100% !important;">
+  <el-container style="background: white; height: 100% !important;display: block;">
     <el-main v-if="!isEmptyValue(isAddTypePay)" style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; overflow: auto; padding-left: 0px;">
       <el-row :gutter="24">
         <template v-for="(value, key) in isAddTypePay">
@@ -463,6 +463,9 @@ export default {
     },
     deleteCollect(key) {
       const paymentUuid = key.uuid
+      if (!this.isEmptyValue(key.is_automatic) && key.is_automatic) {
+        return
+      }
       const deletetPayments = !this.isEmptyValue(key.is_paid) ? 'deleteRefundReferences' : 'deletetPayments'
       this.$store.dispatch(deletetPayments, {
         posUuid: this.currentPointOfSales.uuid,
