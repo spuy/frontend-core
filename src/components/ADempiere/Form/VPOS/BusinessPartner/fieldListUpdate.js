@@ -101,5 +101,30 @@ export default [
       isMandatory: true,
       size: 8
     }
+  },
+  // IsTaxpayer
+  {
+    fieldUuid: '06d18869-f3af-4021-bddb-bb63a9a1f3ad',
+    uuid: '06d18869-f3af-4021-bddb-bb63a9a1f3ad',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      isCustomField: true,
+      isDisplayed: true,
+      isMandatory: false,
+      isReadonly: false,
+      size: 8
+    }
+  },
+  // PersonType
+  {
+    fieldUuid: 'e699d070-8e2e-11e9-a13e-6ba4b8556bd1',
+    uuid: 'e699d070-8e2e-11e9-a13e-6ba4b8556bd1',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      isCustomField: true,
+      isDisplayed: true,
+      isMandatory: false,
+      size: 8
+    }
   }
 ]
