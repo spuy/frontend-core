@@ -124,8 +124,20 @@ export const runProcessOfBrowser = {
       })
       return
     }
-    store.dispatch('startProcessOfBrowser', {
-      containerUuid
+
+    const process = store.getters.getProcessOfBrowser(containerUuid)
+    /*
+    const storedProcess = store.getters.getStoredProcess(process.uuid)
+    if (isEmptyValue(storedProcess)) {
+      store.dispatch('getProcessDefinitionFromServer', {
+        uuid: process.uuid
+      })
+    }
+    */
+
+    store.commit('setShowedModalDialog', {
+      containerUuid: process.uuid,
+      isShowed: true
     })
   }
 }
