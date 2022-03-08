@@ -74,10 +74,12 @@
             </el-card>
           </el-col>
 
+          <!-- generateImmediateInvoice -->
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
-                :style="blockOption"
+                :class="classblockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.generateImmediateInvoice')) : generateImmediateInvoice()"
               >
                 <i class="el-icon-document-add" />
@@ -87,10 +89,12 @@
             </el-card>
           </el-col>
 
+          <!-- completePreparedOrder -->
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
-                :style="blockOption"
+                :class="(isEmptyValue(currentOrder.uuid) || currentOrder.documentStatus.value !== 'DR') ? 'is-disabled-option-card' : 'is-enable-option-card'"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.completePreparedOrder')) : completePreparedOrder()"
               >
                 <i class="el-icon-success" />
@@ -99,6 +103,8 @@
               </p>
             </el-card>
           </el-col>
+
+          <!-- cancelSaleTransaction -->
 
           <el-col v-if="allowsReturnOrder" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
@@ -151,7 +157,11 @@
                   element-loading-background="rgba(255, 255, 255, 0.8)"
                   class="view-loading"
                 />
-                <el-button slot="reference" type="text" style="min-height: 50px;width: -webkit-fill-available;white-space: normal;">
+                <el-button
+                  slot="reference"
+                  type="text"
+                  :class="isEmptyValue(currentOrder.uuid) ? 'is-disabled-option-popover' : 'is-enable-option-popover'"
+                >
                   <i class="el-icon-error" />
                   <br>
                   {{ $t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction') }}
@@ -160,23 +170,12 @@
             </el-card>
           </el-col>
 
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover" style="height: 100px">
-              <p
-                :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createPos')) : withdrawal()"
-              >
-                <i class="el-icon-document-remove" />
-                <br>
-                {{ $t('form.pos.optionsPoinSales.salesOrder.createPos') }}
-              </p>
-            </el-card>
-          </el-col>
+          <!-- printTicket -->
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
-                :style="blockOption"
+                :class="(isEmptyValue(currentOrder.uuid) || !isProcessed) ? 'is-disabled-option-card' : 'is-enable-option-card'"
                 @click="printTicket()"
               >
                 <i class="el-icon-printer" />
@@ -185,10 +184,13 @@
               </p>
             </el-card>
           </el-col>
+
+          <!-- createNewReturnOrder -->
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
-                :style="blockOption"
+                :class="classblockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createNewReturnOrder')) : createNewCustomerReturnOrder()"
               >
                 <i class="el-icon-refresh-left" />
@@ -197,10 +199,13 @@
               </p>
             </el-card>
           </el-col>
+
+          <!-- copyOrder -->
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
-                :style="blockOption"
+                :class="classblockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.copyOrder')) : copyOrder()"
               >
                 <i class="el-icon-document-copy" />
@@ -209,10 +214,14 @@
               </p>
             </el-card>
           </el-col>
+
+          <!-- cancelOrder -->
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
+                :class="(isEmptyValue(currentOrder.uuid) || isProcessed) ? 'is-disabled-option-card' : 'is-enable-option-card'"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelOrder')) : deleteOrder()"
               >
                 <i class="el-icon-close" />
@@ -221,6 +230,9 @@
               </p>
             </el-card>
           </el-col>
+
+          <!-- confirmDelivery -->
+
           <el-col v-if="allowsConfirmShipment" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
@@ -237,7 +249,7 @@
                 />
                 <div
                   slot="reference"
-                  :style="blockOption"
+                  :class="classOptionPopoverConfirmDelivery"
                   @click="openDelivery()"
                 >
                   <svg-icon icon-class="shopping" />
@@ -247,6 +259,9 @@
               </el-popover>
             </el-card>
           </el-col>
+
+          <!-- applyDiscountOnOrder -->
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
@@ -256,7 +271,11 @@
                 placement="top"
               >
                 <div style="padding: 20px;">
-                  <discount-order />
+                  <discount-order
+                    ref="applyDiscountOnOrder"
+                    v-shortkey="showCount ? {close: ['esc'], enter: ['enter']} : {}"
+                    @shortkey.native="theActionDiscount"
+                  />
                 </div>
                 <div style="text-align: right; margin: 0">
                   <el-button
@@ -275,7 +294,8 @@
                 <el-button
                   slot="reference"
                   type="text"
-                  style="min-height: 50px;width: -webkit-fill-available;white-space: normal;"
+                  :disabled="isOptionPopoverDiscuent"
+                  :class="classOptionPopoverDiscuent"
                 >
                   <i class="el-icon-document-remove" />
                   <br>
@@ -284,8 +304,11 @@
               </el-popover>
             </el-card>
           </el-col>
+
+          <!-- salesDiscountOff -->
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover" style="height: 100px">
+            <el-card shadow="hover">
               <el-popover
                 v-model="showSalesDiscount"
                 width="350"
@@ -293,7 +316,11 @@
                 placement="top"
               >
                 <div style="padding: 20px;">
-                  <sales-discount-off />
+                  <sales-discount-off
+                    ref="salesDiscountOff"
+                    v-shortkey="showSalesDiscount ? {close: ['esc'], enter: ['enter']} : {}"
+                    @shortkey.native="theActionSalesDiscountOff"
+                  />
                 </div>
                 <div style="text-align: right; margin: 0">
                   <el-button
@@ -312,7 +339,8 @@
                 <el-button
                   slot="reference"
                   type="text"
-                  style="min-height: 50px;width: -webkit-fill-available;white-space: normal;"
+                  :disabled="isOptionPopoverDiscuent"
+                  :class="classOptionPopoverDiscuent"
                 >
                   <i class="el-icon-document-remove" />
                   <br>
@@ -530,7 +558,7 @@ export default {
 
   data() {
     return {
-      activeName: '',
+      activeName: 'salesOrder',
       processPos: '',
       pin: '',
       isAction: false,
@@ -714,6 +742,28 @@ export default {
       }
       return 'cursor: not-allowed; text-align: center !important; color: gray;min-height: 50px;'
     },
+    blockOptionIsProcess() {
+      if (!this.isEmptyValue(this.currentOrder.uuid)) {
+        return this.currentOrder.isProcessed
+      }
+      return true
+    },
+    isOptionPopoverDiscuent() {
+      if (!this.isEmptyValue(this.currentOrder.uuid) && this.currentOrder.grandTotal > 0) return this.currentOrder.isProcessed
+      return true
+    },
+    classOptionPopoverDiscuent() {
+      if (this.isOptionPopoverDiscuent) return 'is-disabled-option-popover'
+      return 'is-enable-option-popover'
+    },
+    classOptionPopoverConfirmDelivery() {
+      if (!this.isOptionPopoverDiscuent || !this.isProcessed || this.currentOrder.isDelivered) return 'is-disabled-option-popover'
+      return 'is-enable-option-popover'
+    },
+    classblockOption() {
+      if (!this.isEmptyValue(this.currentOrder.uuid)) return 'is-enable-option-card'
+      return 'is-disabled-option-card'
+    },
     size() {
       const size = this.$store.getters.getWidthLeft
       return 24 / size
@@ -790,6 +840,20 @@ export default {
           this.focusPin()
         }, 300)
       }
+    },
+    showCount(value) {
+      if (value && !this.isEmptyValue(this.$refs)) {
+        setTimeout(() => {
+          this.focusDiscount(value, 'applyDiscountOnOrder')
+        }, 300)
+      }
+    },
+    showSalesDiscount(value) {
+      if (value && !this.isEmptyValue(this.$refs)) {
+        setTimeout(() => {
+          this.focusDiscount(value, 'salesDiscountOff')
+        }, 300)
+      }
     }
   },
 
@@ -842,6 +906,44 @@ export default {
             break
           case 'close':
             this.closePin()
+            break
+        }
+      }
+    },
+    focusDiscount(value, ref) {
+      this.$refs[ref].$children[0].$children[0].$children[0].$children[0].$children[1].isShowed = value
+      this.$refs[ref].$children[0].$children[0].$children[0].$children[0].$children[1].$children[0].$children[0].focus()
+    },
+    theActionDiscount(event) {
+      if (this.showCount) {
+        switch (event.srcKey) {
+          case 'enter':
+            if (this.discountAmount > 1) this.addCount(this.discountAmount)
+            break
+          case 'close':
+            this.showCount = false
+            this.$store.commit('updateValueOfField', {
+              containerUuid: 'Discount-Order',
+              columnName: 'Discount',
+              value: ''
+            })
+            break
+        }
+      }
+    },
+    theActionSalesDiscountOff(event) {
+      if (this.showSalesDiscount) {
+        switch (event.srcKey) {
+          case 'enter':
+            if (this.discountAmount > 0) this.SalesDiscount(this.discountRateOff)
+            break
+          case 'close':
+            this.showSalesDiscount = false
+            this.$store.commit('updateValueOfField', {
+              containerUuid: 'Sales-Discount-Off',
+              columnName: 'Discount',
+              value: ''
+            })
             break
         }
       }
@@ -1006,7 +1108,7 @@ export default {
       this.$store.commit('setShowPOSOptions', false)
     },
     completePreparedOrder() {
-      if (this.isEmptyValue(this.currentOrder.uuid)) {
+      if (this.isEmptyValue(this.currentOrder.uuid) || this.currentOrder.documentStatus.value !== 'DR') {
         return ''
       }
       const orderUuid = this.currentOrder.uuid
@@ -1091,6 +1193,11 @@ export default {
       this.$store.commit('setShowPOSOptions', false)
     },
     createNewCustomerReturnOrder() {
+      // TODO: New Customer Return Order
+      if (this.isEmptyValue(this.currentOrder.uuid)) {
+        return ''
+      }
+
       createNewReturnOrder({
         orderUuid: this.currentOrder.uuid
       })
@@ -1107,16 +1214,18 @@ export default {
       })
     },
     copyOrder() {
+      // TODO: Support Copy Order
       if (this.isEmptyValue(this.currentOrder.uuid)) {
         return ''
       }
+      console.info('Support Copy Order', this.currentOrder.uuid)
     },
     copyLineOrder() {
       const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
       this.showModal(process)
     },
     deleteOrder() {
-      if (this.isEmptyValue(this.currentOrder.uuid)) {
+      if (this.isEmptyValue(this.currentOrder.uuid) || this.isProcessed) {
         return ''
       }
       this.$store.dispatch('updateOrderPos', true)
@@ -1125,20 +1234,25 @@ export default {
       })
         .then(response => {
           this.changePos(this.currentPointOfSales)
-        })
-        .finally(() => {
-          this.$store.dispatch('listOrdersFromServer', {
-            posUuid: this.currentPointOfSales.uuid
-          })
           this.$message({
             type: 'success',
             message: this.$t('form.pos.optionsPoinSales.salesOrder.orderRemoved'),
             showClose: true
           })
+          this.$store.dispatch('listOrdersFromServer', {
+            posUuid: this.currentPointOfSales.uuid
+          })
           this.$store.dispatch('updateOrderPos', false)
           // close panel lef
           this.$store.commit('setShowPOSOptions', false)
           this.newOrder()
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: error.message,
+            showClose: true
+          })
         })
     },
     addCount(discountAmount) {
@@ -1178,11 +1292,13 @@ export default {
         isDiscountOrder: true
       })
         .then(response => {
-          this.$message({
-            type: 'success',
-            showClose: true,
-            message: 'ok'
-          })
+          setTimeout(() => {
+            this.$message({
+              type: 'success',
+              showClose: true,
+              message: 'ok'
+            })
+          }, 2000)
         })
       this.$store.commit('updateValueOfField', {
         containerUuid: 'Sales-Discount-Off',
@@ -1304,6 +1420,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .is-disabled-option-popover {
+    cursor: not-allowed;
+    text-align: center !important;
+    color: gray !important;
+    min-height: 50px;
+    width: -webkit-fill-available;
+    white-space: normal;
+  }
+  .is-enable-option-popover {
+    cursor: pointer;
+    text-align: center !important;
+    color: black;
+    min-height: 50px;
+    width: -webkit-fill-available;
+    white-space: normal;
+  }
+  .is-disabled-option-card {
+    cursor: not-allowed;
+    text-align: center !important;
+    color: gray !important;
+    min-height: 50px;
+  }
+  .is-enable-option-card {
+    cursor: pointer;
+    text-align: center !important;
+    color: black !important;
+    min-height: 50px;
+  }
   .el-button--text {
     border-color: transparent;
     color: black;
