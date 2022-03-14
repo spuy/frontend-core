@@ -22,13 +22,13 @@
     :parent-uuid="parentUuid"
     :container-uuid="containerUuid"
     :container-manager="containerManager"
-    :panel-metadata="metadata"
+    :panel-metadata="panelMetadata"
     :is-show-filter="isShowFilter"
   />
 </template>
 
 <script>
-import { defineComponent, computed, ref } from '@vue/composition-api'
+import { defineComponent, computed } from '@vue/composition-api'
 
 export default defineComponent({
   name: 'PanelDefinition',
@@ -53,8 +53,6 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    const metadata = ref({})
-
     if (root.$route.query.action === 'create-new') {
       props.containerManager.setDefaultValues({
         parentUuid: props.parentUuid,
@@ -63,31 +61,25 @@ export default defineComponent({
     }
 
     const componentRender = computed(() => {
-      return () => import('@/components/ADempiere/PanelDefinition/StandardPanel.vue')
+      const panelComponent = () => import('@/components/ADempiere/PanelDefinition/StandardPanel.vue')
+      return panelComponent
     })
 
     /**
-     * Get the tab object with all its attributes as well as
+     * Get the panel object with all its attributes as well as
      * the fields it contains
      */
-    const getPanel = () => {
-      if (props.containerManager && props.containerManager.getPanel) {
-        metadata.value = props.containerManager.getPanel({
-          containerUuid: props.containerUuid
-        })
-        return
-      }
-      // generated panel properties
-      // set panel genereated
-      metadata.value = props.panelMetadata
-    }
-
-    getPanel()
+    const panelMetadata = computed(() => {
+      return props.containerManager.getPanel({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid
+      })
+    })
 
     return {
       // computeds
-      componentRender,
-      metadata
+      panelMetadata,
+      componentRender
     }
   }
 })
