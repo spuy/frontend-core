@@ -117,9 +117,21 @@ export default {
           case 'RC':
             dashboard = () => import('@/components/ADempiere/Dashboard/charts/PieChart')
             break
+          //  Raddar Chart
+          case 'RA':
+            dashboard = () => import('@/components/ADempiere/Dashboard/charts/RaddarChart')
+            break
           //  Waterfall Chart
           case 'WC':
             dashboard = () => import('@/components/ADempiere/Dashboard/charts/WaterfallChart')
+            break
+          //  Basic Scatter Chart
+          case 'SC':
+            dashboard = () => import('@/components/ADempiere/Dashboard/charts/Scatter')
+            break
+          //  Gauge
+          case 'GU':
+            dashboard = () => import('@/components/ADempiere/Dashboard/charts/Gauge')
             break
           default:
             dashboard = () => import('@/components/ADempiere/Dashboard/charts/LineChart')

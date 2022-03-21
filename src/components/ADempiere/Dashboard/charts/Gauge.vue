@@ -25,6 +25,8 @@ require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
 import { getMetrics } from '@/api/ADempiere/dashboard/chart'
 
+const animationDuration = 2800
+
 export default {
   mixins: [resize],
   props: {
@@ -38,7 +40,11 @@ export default {
     },
     height: {
       type: String,
-      default: '300px'
+      default: '350px'
+    },
+    autoResize: {
+      type: Boolean,
+      default: true
     },
     metadata: {
       type: Object,
@@ -48,6 +54,14 @@ export default {
   data() {
     return {
       chart: null
+    }
+  },
+  watch: {
+    chartData: {
+      deep: true,
+      handler(val) {
+        this.setOptions(val)
+      }
     }
   },
   mounted() {
@@ -88,72 +102,77 @@ export default {
     loadChartMetrics(metrics) {
       const xAxisValues = []
       let seriesToShow = []
-      let legendToShow = []
       if (!this.isEmptyValue(metrics.series)) {
-        if (metrics.series.length > 0) {
-          metrics.series.forEach(serie => {
-            serie.data_set.forEach(set => {
-              if (!xAxisValues.find(value => value === set.name)) {
-                xAxisValues.push(set.name)
-              }
-            })
-          })
-        }
         seriesToShow = metrics.series.map(serie => {
           return {
             name: serie.name,
-            type: 'bar',
-            data: serie.data_set.map(set => set.value),
-            animationDelay: function(idx) {
-              return idx * 10
+            animationDuration,
+            type: 'gauge',
+            min: 0,
+            max: metrics.measureTarget,
+            splitNumber: 15,
+            radius: '100%',
+            data: [{
+              value: serie.data_set.map(set => set.value).reduce((partialSum, a) => partialSum + a, 0),
+              name: metrics.name
+            }],
+            axisLine: {
+              lineStyle: {
+                color: metrics.colorSchemas.filter(colorSchema => colorSchema.percent > 0).map(colorSchema => {
+                  return [
+                    colorSchema.percent / 100,
+                    colorSchema.color
+                  ]
+                }),
+                width: 5,
+                shadowColor: '#fff',
+                shadowBlur: 10
+              }
+            },
+            splitLine: {
+              length: 25,
+              lineStyle: {
+                width: 3,
+                color: 'inherit',
+                shadowColor: 'auto',
+                shadowBlur: 10
+              }
+            },
+            pointer: {
+              shadowColor: 'auto',
+              shadowBlur: 5
+            },
+            detail: {
+              ackgroundColor: 'auto',
+              borderColor: 'inherit',
+              offsetCenter: [0, '50%'],
+              fontWeight: 'bolder',
+              fontSize: 20,
+              fontStyle: 'italic',
+              color: 'inherit',
+              shadowColor: 'auto',
+              shadowBlur: 10
             }
           }
         })
-        legendToShow = metrics.series.map(serie => serie.name)
       }
       this.chart.setOption({
-        tooltip: {
-          backgroundColor: '#FFF',
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
         toolbox: {
-          // y: 'bottom',
+          show: true,
           feature: {
-            magicType: {
-              type: ['stack', 'tiled']
-            },
-            dataView: {},
+            dataView: xAxisValues,
             saveAsImage: {
               pixelRatio: 2
+            },
+            mark: {
+              show: true
+            },
+            restore: {
+              show: true
             }
           }
         },
-        xAxis: [{
-          data: xAxisValues,
-          type: 'category',
-          splitLine: {
-            show: false
-          }
-        }],
-        yAxis: {
-        },
-        legend: {
-          data: legendToShow
-        },
-        series: seriesToShow,
-        animationEasing: 'elasticOut',
-        animationDelayUpdate: function(idx) {
-          return idx * 5
-        }
+        series: seriesToShow
       })
       this.chart.hideLoading()
     }

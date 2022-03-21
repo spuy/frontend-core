@@ -25,6 +25,8 @@ require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
 import { getMetrics } from '@/api/ADempiere/dashboard/chart'
 
+const animationDuration = 2800
+
 export default {
   mixins: [resize],
   props: {
@@ -38,7 +40,11 @@ export default {
     },
     height: {
       type: String,
-      default: '300px'
+      default: '350px'
+    },
+    autoResize: {
+      type: Boolean,
+      default: true
     },
     metadata: {
       type: Object,
@@ -48,6 +54,14 @@ export default {
   data() {
     return {
       chart: null
+    }
+  },
+  watch: {
+    chartData: {
+      deep: true,
+      handler(val) {
+        this.setOptions(val)
+      }
     }
   },
   mounted() {
@@ -102,28 +116,32 @@ export default {
         seriesToShow = metrics.series.map(serie => {
           return {
             name: serie.name,
-            type: 'bar',
+            stack: 'vistors',
             data: serie.data_set.map(set => set.value),
-            animationDelay: function(idx) {
-              return idx * 10
-            }
+            animationDuration,
+            smooth: true,
+            large: true,
+            type: 'scatter',
+            animationEasing: 'quadraticOut',
+            lineStyle: {
+              width: 2
+            },
+            areaStyle: {}
           }
         })
         legendToShow = metrics.series.map(serie => serie.name)
       }
       this.chart.setOption({
-        tooltip: {
-          backgroundColor: '#FFF',
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
+        xAxis: {
+          data: xAxisValues,
+          type: 'category',
+          boundaryGap: false,
+          splitLine: {
+            show: true
+          },
+          axisLine: {
+            show: false
           }
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
         },
         toolbox: {
           // y: 'bottom',
@@ -137,23 +155,30 @@ export default {
             }
           }
         },
-        xAxis: [{
-          data: xAxisValues,
-          type: 'category',
-          splitLine: {
+        grid: {
+          left: 10,
+          right: 10,
+          bottom: 20,
+          top: 30,
+          containLabel: true
+        },
+        tooltip: {
+          backgroundColor: '#FFF',
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross'
+          },
+          padding: [5, 10]
+        },
+        yAxis: {
+          axisTick: {
             show: false
           }
-        }],
-        yAxis: {
         },
         legend: {
           data: legendToShow
         },
-        series: seriesToShow,
-        animationEasing: 'elasticOut',
-        animationDelayUpdate: function(idx) {
-          return idx * 5
-        }
+        series: seriesToShow
       })
       this.chart.hideLoading()
     }

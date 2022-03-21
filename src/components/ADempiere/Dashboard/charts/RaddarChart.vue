@@ -76,6 +76,7 @@ export default {
     },
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
+      this.chart.showLoading()
       getMetrics({
         id: this.metadata.id
       })
@@ -165,6 +166,7 @@ export default {
           animationDuration: animationDuration
         }]
       })
+      this.chart.hideLoading()
     }
   }
 }
