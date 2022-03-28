@@ -38,6 +38,7 @@ export const getContext = ({
   parentUuid,
   containerUuid,
   isBooleanToString = false,
+  isForceBoolean = true,
   columnName
 }) => {
   let value
@@ -62,7 +63,7 @@ export const getContext = ({
   }
 
   if (isBooleanToString) {
-    return convertBooleanToString(value)
+    return convertBooleanToString(value, isForceBoolean)
   }
 
   return value
@@ -137,7 +138,7 @@ export function getPreference({
  * @param {string} displayLogic
  * @param {string} mandatoryLogic
  * @param {string} readOnlyLogic
- * @param {object} reference
+ * @param {object} reference.contextColumnNames array
  * @param {string} defaultValue
  * @returns {array} List column name of parent fields
  */
@@ -148,12 +149,10 @@ export function getParentFields({
   reference,
   defaultValue
 }) {
-  const validationCode = []
+  let contextColumnNames = []
   //  Validate reference
-  if (!isEmptyValue(reference) && !isEmptyValue(reference.validationCode)) {
-    validationCode.push(
-      ...evaluator.parseDepends(reference.validationCode)
-    )
+  if (!isEmptyValue(reference) && !isEmptyValue(reference.contextColumnNames)) {
+    contextColumnNames = reference.contextColumnNames
   }
   const parentFields = Array.from(new Set([
     //  For Display logic
@@ -164,8 +163,8 @@ export function getParentFields({
     ...evaluator.parseDepends(readOnlyLogic),
     //  For Default Value
     ...evaluator.parseDepends(defaultValue),
-    //  For Validation Code
-    ...validationCode
+    //  For Validation Code / SQL values
+    ...contextColumnNames
   ]))
 
   return parentFields
@@ -313,7 +312,9 @@ export function parseContext({
 export function getContextAttributes({
   parentUuid,
   containerUuid,
-  contextColumnNames = []
+  contextColumnNames = [],
+  isBooleanToString = false,
+  isForceBoolean = false
 }) {
   const contextAttributesList = []
   if (isEmptyValue(contextColumnNames)) {
@@ -324,7 +325,9 @@ export function getContextAttributes({
     const value = getContext({
       parentUuid,
       containerUuid,
-      columnName
+      columnName,
+      isBooleanToString,
+      isForceBoolean
     })
 
     contextAttributesList.push({

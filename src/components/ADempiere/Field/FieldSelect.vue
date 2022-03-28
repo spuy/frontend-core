@@ -45,10 +45,10 @@
 
 <script>
 // components and mixins
-import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+import selectMixin from '@/components/ADempiere/Field/mixin/mixinSelect.js'
 
 // utils and helper methods
-import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
@@ -58,7 +58,6 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
  * - Table Direct
  *
  * TODO: String values add single quotation marks 'value'
- * TODO: Add support to valuesList filter on proxy-api
  * TODO: No blanck option enabled if is mandatory field
  * TODO: ALL: Although in the future these will have different components, and
  * are currently not supported is also displayed as a substitute for fields:
@@ -68,30 +67,11 @@ export default {
   name: 'FieldSelect',
 
   mixins: [
-    FieldMixin
+    fieldMixin,
+    selectMixin
   ],
 
-  data() {
-    // label with '' value is assumed to be undefined non-existent
-    const label = ' '
-    const blankOption = {
-      label,
-      value: undefined,
-      uuid: undefined
-    }
-
-    return {
-      isLoading: false,
-      optionsList: [blankOption],
-      blankValues: [null, undefined, -1, '-1'],
-      blankOption
-    }
-  },
-
   computed: {
-    isSelectMultiple() {
-      return ['IN', 'NOT_IN'].includes(this.metadata.operator) && this.metadata.isAdvancedQuery
-    },
     cssClassStyle() {
       let styleClass = ' custom-field-select '
       if (this.isSelectMultiple) {
@@ -108,38 +88,7 @@ export default {
 
       return styleClass
     },
-    getLookupList() {
-      if (!this.metadata.displayed) {
-        return [this.blankOption]
-      }
-      return this.$store.getters.getStoredLookupList({
-        parentUuid: this.metadata.parentUuid,
-        containerUuid: this.metadata.containerUuid,
-        uuid: this.metadata.uuid,
-        tableName: this.metadata.reference.tableName,
-        columnName: this.metadata.columnName
-      })
-    },
-    getLookupAll() {
-      const allOptions = this.$store.getters.getStoredLookupAll({
-        parentUuid: this.metadata.parentUuid,
-        containerUuid: this.metadata.containerUuid,
-        uuid: this.metadata.uuid,
-        tableName: this.metadata.reference.tableName,
-        query: this.metadata.reference.query,
-        validationCode: this.metadata.reference.validationCode,
-        directQuery: this.metadata.reference.directQuery,
-        value: this.value
-      })
 
-      // sets the value to blank when the lookupList or lookupItem have no
-      // values, or if only lookupItem does have a value
-      if (this.isEmptyValue(allOptions) || (allOptions.length &&
-        (!this.blankValues.includes(allOptions[0].value)))) {
-        allOptions.unshift(this.blankOption)
-      }
-      return allOptions
-    },
     value: {
       get() {
         const { columnName, containerUuid, inTable } = this.metadata
@@ -314,10 +263,6 @@ export default {
     }
   },
 
-  created() {
-    this.changeBlankOption()
-  },
-
   beforeMount() {
     if (this.metadata.displayed) {
       this.optionsList = this.getLookupAll
@@ -345,18 +290,6 @@ export default {
   },
 
   methods: {
-    parseValue(value) {
-      if (typeof value === 'boolean') {
-        // value ? 'Y' : 'N'
-        value = convertBooleanToString(value)
-      }
-      return value
-    },
-    changeBlankOption() {
-      if (Number(this.metadata.defaultValue) === -1) {
-        this.blankOption.value = this.metadata.defaultValue
-      }
-    },
     preHandleChange(value) {
       const { label } = this.findOption(value)
       this.displayedValue = label
@@ -377,16 +310,20 @@ export default {
       }
     },
     async getDataLookupItem() {
-      if (this.isEmptyValue(this.metadata.reference.directQuery) ||
-        (this.metadata.isAdvancedQuery && this.isSelectMultiple)) {
+      if (this.metadata.isAdvancedQuery && this.isSelectMultiple) {
         return
       }
       this.isLoading = true
-      this.$store.dispatch('getLookupItemFromServer', {
+
+      this.containerManager.getLookupItem({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        contextColumnNames: this.metadata.reference.contextColumnNames,
+        uuid: this.metadata.uuid,
+        id: this.metadata.id,
+        //
         tableName: this.metadata.reference.tableName,
-        directQuery: this.metadata.reference.directQuery,
+        columnName: this.metadata.columnName,
         value: this.value
       })
         .then(responseLookupItem => {
@@ -420,13 +357,15 @@ export default {
     },
     remoteMethod() {
       this.isLoading = true
+
       this.containerManager.getLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        contextColumnNames: this.metadata.reference.contextColumnNames,
         uuid: this.metadata.uuid,
         //
-        columnName: this.metadata.columnName,
         tableName: this.metadata.reference.tableName,
+        columnName: this.metadata.columnName,
         // app attributes
         isAddBlankValue: true,
         blankValue: this.blankOption.value
@@ -443,14 +382,14 @@ export default {
         })
     },
     clearLookup() {
-      this.$store.dispatch('deleteLookupList', {
+      this.$store.dispatch('deleteLookup', {
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        contextColumnNames: this.metadata.reference.contextColumnNames,
         uuid: this.metadata.uuid,
+        //
         tableName: this.metadata.reference.tableName,
-        query: this.metadata.reference.query,
-        directQuery: this.metadata.reference.directQuery,
-        validationCode: this.metadata.reference.validationCode,
+        columnName: this.metadata.columnName,
         value: this.value
       })
         .then(() => {
