@@ -93,7 +93,6 @@ export default defineComponent({
       return !isEmptyValue(props.windowMetadata.tabsListChild)
     })
 
-
     const allTabsList = ref([])
 
     const showRecordAccess = computed(() => {
