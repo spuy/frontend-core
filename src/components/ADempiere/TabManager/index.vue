@@ -309,11 +309,17 @@ export default defineComponent({
         parentUuid: props.parentUuid,
         containerUuid
       }).then(responseData => {
+        const tab = store.getters.getStoredTab(props.parentUuid, containerUuid)
         if (isCreateNew.value || isEmptyValue(responseData)) {
+          // set values in panel
+          props.containerManager.seekRecord({
+            parentUuid: props.parentUuid,
+            containerUuid,
+            row: {}
+          })
           return
         }
 
-        const tab = store.getters.getStoredTab(props.parentUuid, containerUuid)
         let row = {}
         const { action } = root.$route.query
         // uuid into action query
@@ -355,8 +361,7 @@ export default defineComponent({
         props.containerManager.seekRecord({
           parentUuid: props.parentUuid,
           containerUuid,
-          row,
-          tableName: tab.tableName
+          row
         })
       })
     }
