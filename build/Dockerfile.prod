@@ -1,8 +1,8 @@
 FROM nginx:1.21.6-alpine
 
 
-LABEL maintainer="EdwinBetanc0urt@outlook.com" \
-	description="ADempiere-Vue"
+LABEL maintainer="Elsiosanches@gmail.com" \
+	description="ADempiere-Vue."
 
 
 ENV API_URL="https://api.erpya.com"
