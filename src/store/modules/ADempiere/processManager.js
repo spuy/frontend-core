@@ -217,6 +217,81 @@ const processManager = {
       })
     },
 
+    startProcessOfWindows({ commit, dispatch, getters, rootGetters }, {
+      parentUuid,
+      containerUuid
+    }) {
+      return new Promise(resolve => {
+        const recordUuid = router.app._route.query.action
+        const windowsUuid = router.app._route.meta.uuid
+        const browserDefinition = getters.getStoredTab(windowsUuid, parentUuid)
+        const processModal = getters.getModalDialogManager({
+          containerUuid: containerUuid
+        })
+        const currentProcess = browserDefinition.processes.find(process => process.name === processModal.title)
+
+        // })
+        const fieldsList = getters.getStoredFieldsFromProcess(containerUuid)
+        const parametersList = rootGetters.getProcessParameters({
+          containerUuid,
+          fieldsList
+        })
+
+        const isSession = !isEmptyValue(getToken())
+        let procesingNotification = {
+          close: () => false
+        }
+        if (isSession) {
+          procesingNotification = showNotification({
+            title: language.t('notifications.processing'),
+            message: currentProcess.name,
+            summary: currentProcess.description,
+            type: 'info'
+          })
+        }
+
+        let isProcessedError = false
+        let summary = ''
+        requestRunProcess({
+          uuid: containerUuid,
+          parametersList,
+          recordUuid
+        })
+          .then(runProcessRepsonse => {
+            isProcessedError = runProcessRepsonse.isError
+            summary = runProcessRepsonse.summary
+
+            resolve(runProcessRepsonse)
+          })
+          .catch(error => {
+            isProcessedError = true
+            console.warn(`Error getting print formats: ${error.message}. Code: ${error.code}.`)
+          })
+          .finally(() => {
+            // commit('resetStateWindowManager', {
+            //   containerUuid: parentUuid
+            // })
+            // dispatch('setTabDefaultValues', {
+            //   containerUuid: parentUuid
+            // })
+
+            dispatch('finishProcess', {
+              summary,
+              name: currentProcess.name,
+              isError: isProcessedError
+            })
+              .then(() => {
+                // close runing process notification
+                if (!isEmptyValue(procesingNotification)) {
+                  setTimeout(() => {
+                    procesingNotification.close()
+                  }, 1000)
+                }
+              })
+          })
+      })
+    },
+
     finishProcess({ commit }, {
       name,
       summary,
