@@ -389,6 +389,7 @@ export default defineComponent({
     function getWindow() {
       let window = storedWindow.value
       if (!isEmptyValue(window)) {
+        generateWindow()
         setLoadWindow(window)
         return
       }
