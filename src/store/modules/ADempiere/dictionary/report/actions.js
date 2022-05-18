@@ -186,11 +186,12 @@ export default {
           icon: 'el-icon-document',
           enabled: true,
           svg: false,
-          actionName: 'runReportAs',
+          actionName: 'runReportView',
           uuid: null,
-          runReportAs: ({ root, containerUuid }) => {
+          runReportView: ({ root, containerUuid }) => {
             root.$store.dispatch('buildReport', {
               containerUuid,
+              action: reportView,
               reportViewUuid: reportView.reportViewUuid
             })
           }
