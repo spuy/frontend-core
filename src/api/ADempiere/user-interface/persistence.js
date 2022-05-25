@@ -18,6 +18,9 @@
 import { request } from '@/utils/ADempiere/request'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
+// constants
+import { ROWS_OF_RECORDS_BY_PAGE } from '@/utils/ADempiere/constants/table'
+
 /**
  * Object List from window
  * @param {string} windowUuid
@@ -37,7 +40,7 @@ export function getEntities({
   searchValue = '',
   filters = [],
   pageToken,
-  pageSize
+  pageSize = ROWS_OF_RECORDS_BY_PAGE
 }) {
   // used as where clause
   if (!isEmptyValue(filters)) {

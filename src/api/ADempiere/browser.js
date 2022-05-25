@@ -18,6 +18,9 @@
 import { request } from '@/utils/ADempiere/request'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
+// constants
+import { ROWS_OF_RECORDS_BY_PAGE } from '@/utils/ADempiere/constants/table'
+
 /**
  * Request a browser search
  * @param {string} uuid
@@ -41,7 +44,7 @@ export function requestBrowserSearch({
   tableName,
   contextAttributesList = [],
   nextPageToken: pageToken,
-  pageSize
+  pageSize = ROWS_OF_RECORDS_BY_PAGE
 }) {
   const filters = parametersList.map(parameter => {
     return {

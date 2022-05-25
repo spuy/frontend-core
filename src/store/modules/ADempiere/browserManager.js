@@ -24,10 +24,11 @@ import { requestBrowserSearch } from '@/api/ADempiere/browser'
 import { ROW_ATTRIBUTES, ROW_KEY_ATTRIBUTES } from '@/utils/ADempiere/constants/table'
 
 // utils and helper methods
-import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 import { getContextAttributes } from '@/utils/ADempiere/contextUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
 import { isDisplayedField } from '@/utils/ADempiere/dictionary/browser'
+import { generatePageToken } from '@/utils/ADempiere/dataUtils'
 
 const initState = {
   browserData: {}
@@ -140,13 +141,12 @@ const browserControl = {
           type: 'info'
         })
 
+        const currentPageNumber = pageNumber
+
         let pageToken
         if (!isEmptyValue(pageNumber)) {
           pageNumber-- // TODO: Remove with fix in backend
-          const token = getters.getBrowserPageToken({
-            containerUuid
-          })
-          pageToken = generatePageToken({ pageNumber, token })
+          pageToken = generatePageToken({ pageNumber })
         }
 
         const { fieldsList, contextColumnNames } = rootGetters.getStoredBrowser(containerUuid)
@@ -177,7 +177,6 @@ const browserControl = {
           containerUuid,
           isLoaded: false
         })
-
         requestBrowserSearch({
           uuid: containerUuid,
           contextAttributesList,
@@ -194,16 +193,12 @@ const browserControl = {
               }
             })
 
-            let token = browserSearchResponse.nextPageToken
-            if (token !== undefined) {
-              token = token.slice(0, -2)
-            }
-
             commit('setBrowserData', {
               containerUuid,
               recordsList,
               recordCount: browserSearchResponse.recordCount,
-              nextPageToken: token,
+              nextPageToken: browserSearchResponse.nextPageToken,
+              pageNumber: currentPageNumber,
               isLoaded: true
             })
 
@@ -256,11 +251,17 @@ const browserControl = {
     getBrowserRecordsList: (state, getters) => ({ containerUuid }) => {
       return getters.getBrowserData(containerUuid).recordsList
     },
+    getBrowserIsLoadedRecordsList: (state, getters) => ({ containerUuid }) => {
+      return state.browserData[containerUuid].isLoaded
+    },
     getBrowserSelectionsList: (state, getters) => ({ containerUuid }) => {
       return getters.getBrowserData(containerUuid).selectionsList
     },
     getBrowserPageNumber: (state, getters) => ({ containerUuid }) => {
       return getters.getBrowserData(containerUuid).pageNumber
+    },
+    getBrowserRecordCount: (state, getters) => ({ containerUuid }) => {
+      return getters.getBrowserData(containerUuid).recordCount
     },
     getBrowserPageToken: (state, getters) => ({ containerUuid }) => {
       return getters.getBrowserData(containerUuid).nextPageToken
