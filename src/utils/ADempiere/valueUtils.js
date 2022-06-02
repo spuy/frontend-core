@@ -519,14 +519,22 @@ export function tableColumnDataType(column, currentOption) {
   if (currentOption === language.t('table.dataTable.showAllColumns')) {
     return true
   }
+  if (currentOption === language.t('table.dataTable.showAllColumns')) {
+    return true
+  }
   if (currentOption === language.t('table.dataTable.showOnlyMandatoryColumns') && (column.isMandatory || column.isMandatoryFromLogic)) {
     return true
   }
   if (currentOption === language.t('table.dataTable.showTableColumnsOnly') && column.isDisplayedGrid) {
     return true
   }
+  if (currentOption === language.t('table.dataTable.showMinimalistView') &&
+    ['AD_Client_ID', 'AD_Org_ID', 'IsActive'].includes(column.columnName)) {
+    return true
+  }
   return false
 }
+
 // export function convertValuesToSendListOrders(values) {
 //   const valuesToSend = {}
 
@@ -574,6 +582,7 @@ export function tableColumnDataType(column, currentOption) {
 //   })
 //   return valuesToSend
 // }
+
 /**
  * Search in the currency lists for the current currency
  * @author Elsio Sanchez <elsiosanches@gmail.com>
