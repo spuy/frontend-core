@@ -16,7 +16,6 @@
 
 import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { GLOBAL_CONTEXT_PREFIX, ACCOUNTING_CONTEXT_PREFIX } from '@/utils/ADempiere/contextUtils'
 
 /**
  * This class is used for evaluate a conditional
@@ -36,6 +35,21 @@ import { GLOBAL_CONTEXT_PREFIX, ACCOUNTING_CONTEXT_PREFIX } from '@/utils/ADempi
  *  - Strings may be in single quotes (optional)
  */
 class evaluator {
+  /**
+   * Prefix context of global prefix (#)
+   */
+  static GLOBAL_CONTEXT_PREFIX = `#`
+
+   /**
+    * Prefix context of accounting prefix ($)
+    */
+  static ACCOUNTING_CONTEXT_PREFIX = `$`
+
+  /**
+   * Prefix context of preference prefix (P|)
+   */
+  static PREFERENCE_CONTEXT_PREFIX = `P|`
+
   /**
    * Evaluate logic's
    * @param {string} parentUuid Parent (Window / Process / Smart Browser)
@@ -152,8 +166,8 @@ class evaluator {
     expr = /@/
     if (expr.test(first)) {
       first = first.replace(/@/g, '').trim()
-      isGlobal = first.startsWith(GLOBAL_CONTEXT_PREFIX)
-      isCountable = first.startsWith(ACCOUNTING_CONTEXT_PREFIX)
+      isGlobal = first.startsWith(this.GLOBAL_CONTEXT_PREFIX)
+      isCountable = first.startsWith(this.ACCOUNTING_CONTEXT_PREFIX)
       if (isGlobal || isCountable) {
         parentUuid = null
         containerUuid = null
