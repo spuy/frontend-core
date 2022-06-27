@@ -15,7 +15,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import language from '@/lang'
+import router from '@/router'
 import store from '@/store'
+
+// constants
+import { REPORT_VIEWER_NAME } from '@/utils/ADempiere/constants/report'
 
 // utils and helpers methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
@@ -144,8 +148,15 @@ export const runReportAsView = {
   uuid: null,
   childs: [],
   runReportAsView: ({ containerUuid }) => {
+    const currentRoute = router.app._route
+    let instanceUuid = 'not-empty'
+    if (currentRoute.params && currentRoute.params.instanceUuid) {
+      instanceUuid = currentRoute.params.instanceUuid
+    }
+
     store.dispatch('buildReport', {
-      containerUuid
+      containerUuid,
+      instanceUuid
     })
   }
 }
@@ -158,7 +169,8 @@ export const changeParameters = {
   description: language.t('actionMenu.changeParameters'),
   // enabled: true,
   enabled: ({ root }) => {
-    if (root.$route.name === 'Report Viewer') {
+    const currentRoute = router.app._route
+    if (currentRoute.name === REPORT_VIEWER_NAME) {
       return true
     }
     return false

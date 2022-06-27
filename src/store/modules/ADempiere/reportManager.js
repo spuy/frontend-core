@@ -28,6 +28,7 @@ import {
 } from '@/api/ADempiere/report'
 
 // constants
+import { REPORT_VIEWER_NAME } from '@/utils/ADempiere/constants/report'
 import { viewerSupportedFormats, DEFAULT_REPORT_TYPE } from '@/utils/ADempiere/dictionary/report.js'
 
 // utils and helper methods
@@ -176,7 +177,7 @@ const reportManager = {
               }
 
               router.push({
-                name: 'Report Viewer',
+                name: REPORT_VIEWER_NAME,
                 params: {
                   reportUuid: reportDefinition.uuid,
                   instanceUuid,
@@ -631,6 +632,12 @@ const reportManager = {
 
     getReportViewList: (state) => (containerUuid) => {
       return state.reportViewsList[containerUuid] || []
+    },
+
+    getReportView: (state, getters) => ({ containerUuid, reportViewUuid }) => {
+      return getters.getReportViewList(containerUuid).find(reportView => {
+        return reportView.reportViewUuid === reportViewUuid
+      })
     },
 
     getDrillTablesList: (state) => (containerUuid) => {
