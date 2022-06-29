@@ -5,9 +5,11 @@
         <el-col :span="24" style="text-align: center;">
           <el-avatar shape="circle" :size="100" fit="fill" :src="avatarResize" />
           <br>
-          <b> {{ userName }} </b>
-          <br>
-          <el-button round style="margin-top: 3%;"> {{ currentRole.name }} </el-button>
+          <el-button round style="margin-top: 3%;" @click="handleClick">
+            <b>
+              {{ userName }}
+            </b>
+          </el-button>
         </el-col>
       </el-row>
     </router-link>
@@ -69,6 +71,13 @@ export default {
       })
 
       return uri
+    }
+  },
+  methods: {
+    handleClick() {
+      this.$router.push({
+        name: 'Profile'
+      }, () => {})
     }
   }
 }
