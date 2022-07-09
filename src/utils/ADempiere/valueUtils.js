@@ -89,6 +89,17 @@ export const isEmptyValue = function(value) {
 }
 
 /**
+ * It is the same value for both
+ * @param {mixed} valueA
+ * @param {mixed} valueB
+ * @returns {boolean} if valueA equal to valueB
+ */
+export function isSameValues(valueA, valueB) {
+  return valueA === valueB ||
+    (isEmptyValue(valueA) && isEmptyValue(valueB))
+}
+
+/**
  * Evaluates the type of data sent, useful with 'array' type data as the typeof
  * function returns 'object' in this and other cases.
  * @author EdwinBetanc0urt <EdwinBetanc0urt@oulook.com>

@@ -14,10 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import Vue from 'vue'
+
 import language from '@/lang'
 
 // constants
-import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/constants/systemColumns'
+import { LOG_COLUMNS_NAME_LIST, UUID } from '@/utils/ADempiere/constants/systemColumns'
 import { ROW_ATTRIBUTES } from '@/utils/ADempiere/constants/table'
 
 // api request methods
@@ -27,7 +29,7 @@ import {
 } from '@/api/ADempiere/common/persistence.js'
 
 // utils and helper methods
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { isEmptyValue, isSameValues } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
 
 const persistence = {
@@ -49,40 +51,55 @@ const persistence = {
       // valueType,
       value
     }) {
-      if (!isEmptyValue(state.persistence[containerUuid]) && !isEmptyValue(recordUuid)) {
-        state.persistence[containerUuid][recordUuid] = new Map()
-      } else {
-        state.persistence[containerUuid] = {
-          [recordUuid]: new Map()
-        }
+      const key = containerUuid + '_' + recordUuid
+      const values = {
+        columnName,
+        // valueType,
+        oldValue,
+        value
       }
-      // Set value
-      if (!isEmptyValue(state.persistence[containerUuid]) && !isEmptyValue(recordUuid)) {
-        state.persistence[containerUuid][recordUuid].set(columnName, {
-          columnName: columnName,
-          oldValue,
-          value
-        })
-      } else {
-        state.persistence[containerUuid].set([columnName], {
-          columnName: columnName,
-          oldValue,
-          value
-        })
+
+      const currentValues = state.persistence[key]
+
+      if (isEmptyValue(currentValues)) {
+        Vue.set(state.persistence, key, {})
       }
+      Vue.set(state.persistence[key], columnName, values)
+
+      // if (!isEmptyValue(state.persistence[containerUuid]) && !isEmptyValue(recordUuid)) {
+      //   state.persistence[containerUuid][recordUuid] = new Map()
+      // } else {
+      //   state.persistence[containerUuid] = {
+      //     [recordUuid]: new Map()
+      //   }
+      // }
+      // // Set value
+      // if (!isEmptyValue(state.persistence[containerUuid]) && !isEmptyValue(recordUuid)) {
+      //   state.persistence[containerUuid][recordUuid].set(columnName, {
+      //     columnName,
+      //     oldValue,
+      //     value
+      //   })
+      // } else {
+      //   state.persistence[containerUuid].set([columnName], {
+      //     columnName,
+      //     // valueType,
+      //     oldValue,
+      //     value
+      //   })
+      // }
     },
-    clearToPersistence(state, {
+    // clear old values
+    clearPersistenceQueue(state, {
       containerUuid,
-      recordUuid,
-      columnName,
-      oldValue,
-      value
+      recordUuid
     }) {
-      if (state.persistence[containerUuid]) {
-        if (state.persistence[containerUuid][recordUuid]) {
-          state.persistence[containerUuid][recordUuid] = new Map()
-        }
-      }
+      const key = containerUuid + '_' + recordUuid
+      Vue.set(state.persistence, key, {})
+
+      // state.persistence[containerUuid] = {
+      //   [recordUuid]: new Map()
+      // }
     }
   },
 
@@ -95,9 +112,8 @@ const persistence = {
       return new Promise((resolve, reject) => {
         const { parentUuid, containerUuid } = field
         const currentRecord = getters.getTabCurrentRecord({ containerUuid })
-        const autoSave = rootState.settings.autoSave
         let oldValue
-        if (currentRecord) {
+        if (!isEmptyValue(currentRecord)) {
           oldValue = currentRecord[field.columnName]
         }
 
@@ -133,6 +149,7 @@ const persistence = {
           recordUuid = getters.getUuidOfContainer(field.containerUuid)
         }
 
+        const autoSave = rootState.settings.autoSave
         if (autoSave) {
           dispatch('flushPersistenceQueue', {
             containerUuid,
@@ -147,7 +164,7 @@ const persistence = {
       })
     },
 
-    flushPersistenceQueue({ commit, getters }, {
+    flushPersistenceQueue({ commit, dispatch, getters }, {
       containerUuid,
       tableName,
       recordUuid
@@ -175,6 +192,12 @@ const persistence = {
                   type: 'success'
                 })
                 resolve(response)
+
+                // clear old values
+                dispatch('clearPersistenceQueue', {
+                  containerUuid,
+                  recordUuid: response.attributes[UUID]
+                })
               })
               .catch(error => reject(error))
           } else {
@@ -203,16 +226,45 @@ const persistence = {
                 })
 
                 resolve(response)
+
+                // without record uuid to clear new
+                // clear old values
+                dispatch('clearPersistenceQueue', {
+                  containerUuid
+                })
               })
               .catch(error => reject(error))
           }
         }
+      })
+    },
+
+    // clear old values
+    clearPersistenceQueue({ commit }, {
+      containerUuid,
+      recordUuid
+    }) {
+      commit('clearPersistenceQueue', {
+        containerUuid,
+        recordUuid
       })
     }
   },
 
   getters: {
     getPersistenceAttributes: (state) => ({ containerUuid, recordUuid }) => {
+      const key = containerUuid + '_' + recordUuid
+      if (!isEmptyValue(state.persistence[key])) {
+        return Object.values(state.persistence[key])
+          // only changes
+          .filter(attribute => {
+            const { value, oldValue } = attribute
+            return !isSameValues(value, oldValue)
+          })
+      }
+      return []
+    },
+    getPersistenceAttributes2: (state) => ({ containerUuid, recordUuid }) => {
       if (
         !isEmptyValue(containerUuid) &&
         !isEmptyValue(recordUuid) &&
@@ -223,8 +275,12 @@ const persistence = {
         return [
           ...attributesMap.values()
         ]
+          .filter(attribute => {
+            const { value, oldValue } = attribute
+            return !isSameValues(value, oldValue)
+          })
       }
-      return undefined
+      return []
     }
   }
 }
