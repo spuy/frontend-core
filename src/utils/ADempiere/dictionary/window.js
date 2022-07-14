@@ -26,6 +26,8 @@ import {
 import { ROW_ATTRIBUTES } from '@/utils/ADempiere/constants/table'
 
 // utils and helpers methods
+import evaluator from '@/utils/ADempiere/evaluator'
+import { getContext } from '@/utils/ADempiere/contextUtils'
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat'
 import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat'
 import { generatePanelAndFields } from '@/utils/ADempiere/dictionary/panel.js'
@@ -700,6 +702,10 @@ export function generateTabs({
       })
       .map(convertRelationTabs)
 
+    let parentFieldsList = []
+    if (!isEmptyValue(currentTab.displayLogic)) {
+      parentFieldsList = evaluator.parseDepends(currentTab.displayLogic)
+    }
     // let tab = tabItem
     const tab = {
       ...currentTab,
@@ -711,6 +717,21 @@ export function generateTabs({
       childTabs,
       isParentTab,
       parentTabs,
+      parentFieldsList,
+      // evaluate display logic
+      isShowedTab: () => {
+        if (!isEmptyValue(currentTab.displayLogic)) {
+          const isDisplayedFromLogic = evaluator.evaluateLogic({
+            context: getContext,
+            parentUuid,
+            containerUuid: currentTab.uuid,
+            logic: currentTab.displayLogic,
+            defaultReturned: true
+          })
+          return isDisplayedFromLogic
+        }
+        return true
+      },
       // app properties
       isShowedRecordNavigation: !(currentTab.isSingleRow || isParentTab), // TODO: @deprecated
       isShowedTableRecords: !(currentTab.isSingleRow || isParentTab),
