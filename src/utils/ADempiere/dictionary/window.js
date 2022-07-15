@@ -39,10 +39,10 @@ import { getEntity } from '@/api/ADempiere/user-interface/persistence'
 
 export function isReadOnlyTab({ parentUuid, containerUuid }) {
   const { windowType } = store.getters.getStoredWindow(parentUuid)
+  // window is "Only Query" type
   if (windowType === 'Q') {
     return true
   }
-
   const { isReadOnly, readOnlyLogic } = store.getters.getStoredTab(parentUuid, containerUuid)
   // if tab is read only, all fields are read only
   if (isReadOnly) {
@@ -50,16 +50,16 @@ export function isReadOnlyTab({ parentUuid, containerUuid }) {
   }
 
   if (!isEmptyValue(readOnlyLogic)) {
-    // const isReadOnlyFromLogic = evaluator.evaluateLogic({
-    //   context: getContext,
-    //   parentUuid,
-    //   containerUuid,
-    //   logic: readOnlyLogic,
-    //   defaultReturned: false
-    // })
-    // if (isReadOnlyFromLogic) {
-    //   return true
-    // }
+    const isReadOnlyFromLogic = evaluator.evaluateLogic({
+      context: getContext,
+      parentUuid,
+      containerUuid,
+      logic: readOnlyLogic,
+      defaultReturned: false
+    })
+    if (isReadOnlyFromLogic) {
+      return true
+    }
   }
 
   return false
