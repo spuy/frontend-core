@@ -4,10 +4,14 @@ import {
 import { isEmptyValue } from '@/utils/ADempiere'
 import { showMessage } from '@/utils/ADempiere/notification.js'
 import language from '@/lang'
+import { generatePageToken } from '@/utils/ADempiere/dataUtils'
 
 const activity = {
   listActivity: [],
-  currentActivity: {}
+  currentActivity: {},
+  recordCount: 0,
+  pageNumber: 0,
+  isLoadActivity: false
 }
 
 export default {
@@ -16,25 +20,43 @@ export default {
     setActivity(state, activity) {
       state.listActivity = activity
     },
+    setActivityRecordCount(state, recordCount) {
+      state.recordCount = recordCount
+    },
     setCurrentActivity(state, activity) {
       state.currentActivity = activity
+    },
+    setIsLoadActivity(state, load) {
+      state.isLoadActivity = load
+    },
+    setCurrentPage(state, number) {
+      state.pageNumber = number
     }
   },
   actions: {
-    serverListActivity({ commit, state, dispatch, rootGetters }, params) {
-      const userUuid = isEmptyValue(params) ? rootGetters['user/getUserUuid'] : params
+    serverListActivity({ commit, state, dispatch, rootGetters }, pageNumber, pageToken) {
+      const userUuid = rootGetters['user/getUserUuid']
       const name = language.t('navbar.badge.activity')
       if (isEmptyValue(userUuid)) {
         return
       }
+      if (!isEmptyValue(pageNumber)) {
+        commit('setCurrentPage', pageNumber)
+        pageToken = generatePageToken({ pageNumber })
+      }
+      commit('setIsLoadActivity', true)
       workflowActivities({
-        userUuid
+        userUuid,
+        pageToken
       })
         .then(response => {
-          const { listWorkflowActivities } = response
+          commit('setIsLoadActivity', false)
+          const { listWorkflowActivities, recordCount } = response
           commit('setActivity', listWorkflowActivities)
+          commit('setActivityRecordCount', recordCount)
         })
         .catch(error => {
+          commit('setIsLoadActivity', false)
           console.warn(`serverListActivity: ${error.message}. Code: ${error.code}.`)
           showMessage({
             type: 'error',
@@ -76,6 +98,15 @@ export default {
     },
     getActivity: (state) => {
       return state.listActivity
+    },
+    getRecordCount: (state) => {
+      return state.recordCount
+    },
+    getIsLoadActivity: (state) => {
+      return state.isLoadActivity
+    },
+    getCurrentPageNumber: (state) => {
+      return state.pageNumber
     }
   }
 }
