@@ -24,7 +24,7 @@
       />
     </el-header>
     <el-main v-if="isLoadedMetadata">
-      <workflow
+      <panel-workflow
         v-if="!isEmptyValue(node)"
         :node-transition-list="listWorkflowTransition"
         :node-list="node"
@@ -44,26 +44,31 @@
 </template>
 
 <script>
+// components and mixins
 // When supporting the workflow, smart browser and reports,
 // the ContextMenu and sticky must be placed in the layout
 // import ContextMenu from '@theme/components/ADempiere/ContextMenu'
 // import MainPanel from '@theme/components/ADempiere/Panel'
 import TitleAndHelp from '@theme/components/ADempiere/TitleAndHelp'
-import Workflow from '@theme/components/ADempiere/Workflow'
+import panelWorkflow from '@theme/components/ADempiere/Workflow'
+
 import { getWorkflow } from '@/api/ADempiere/workflow.js'
 
 export default {
-  name: 'Workflow',
+  name: 'WorkflowView',
+
   components: {
-    Workflow,
+    panelWorkflow,
     TitleAndHelp
   },
+
   props: {
     isEdit: {
       type: Boolean,
       default: false
     }
   },
+
   data() {
     return {
       size: {
@@ -72,11 +77,17 @@ export default {
       },
       workflowMetadata: {},
       node: [],
+      currentNode: [{
+        classname: 'delete',
+        id: ''
+      }],
+      transitions: [],
       listWorkflowTransition: [],
       isLoadedMetadata: false,
       panelType: 'workflow'
     }
   },
+
   computed: {
     workflowUuid() {
       return this.$route.meta.uuid
@@ -96,9 +107,11 @@ export default {
       })
     }
   },
+
   created() {
     this.gettWorkflow()
   },
+
   methods: {
     gettWorkflow() {
       const workflow = this.getWorkflow
@@ -112,10 +125,12 @@ export default {
           routeToDelete: this.$route
         }).then(workflowResponse => {
           this.workflowMetadata = workflowResponse
-          this.listWorkflow(this.workflowMetadata)
+          this.listWorkflow(workflowResponse)
         }).finally(() => {
           this.isLoadedMetadata = true
         })
+        // this.listWorkflow(this.getWorkflow)
+        this.isLoadedMetadata = true
       }
       this.serverWorkflow(this.workflowMetadata)
     },
@@ -136,7 +151,7 @@ export default {
     listWorkflow(workflow) {
       // Highlight Current Node
       this.transitions = []
-      if (!this.isEmptyValue(workflow.node.uuid)) {
+      if (!this.isEmptyValue(workflow.node) && !this.isEmptyValue(workflow.node.uuid)) {
         this.currentNode = [{
           classname: 'delete',
           id: workflow.start_node.uuid
@@ -198,6 +213,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
   .panel_main {
     height: 100%;

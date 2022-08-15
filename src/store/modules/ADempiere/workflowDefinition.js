@@ -33,7 +33,7 @@ const workflow = {
             const newWorkflow = {
               ...workflowResponse,
               containerUuid,
-              fieldsList: [],
+              // fieldsList: [],
               panelType
             }
 
