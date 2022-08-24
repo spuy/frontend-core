@@ -112,7 +112,8 @@ export default {
             id: stock.warehouse_id,
             uuid: stock.warehouse_uuid,
             attributeName: stock.attribute_name,
-            qty: stock.qty
+            qty: stock.qty,
+            sumaryQty: []
           }
         })
         const options = []
@@ -127,14 +128,22 @@ export default {
           const index = options.findIndex(stock => stock.id === element.id)
           if (!isEmptyValue(currentStock) && !isEmptyValue(options)) {
             options[index].qty = currentStock.qty + element.qty
+            options[index].sumaryQty.push(element.qty)
           }
           if (isEmptyValue(currentStock)) {
             options.push({
-              ...element
+              ...element,
+              sumaryQty: [element.qty]
             })
           }
         })
-        commit('setListWarehouse', options)
+        const listStock = options.map(list => {
+          return {
+            ...list,
+            sumaryQty: list.sumaryQty.reduce((a, b) => a + b, 0)
+          }
+        })
+        commit('setListWarehouse', listStock)
       })
       .catch(error => {
         commit('setListWarehouse', [])
