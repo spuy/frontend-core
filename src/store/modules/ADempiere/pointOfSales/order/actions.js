@@ -317,7 +317,11 @@ export default {
     }
     commit('findOrder', {})
   },
-  printTicket({ commit, dispatch }, { posUuid, orderUuid }) {
+  printTicket({ commit, dispatch, rootGetters }, { posUuid, orderUuid }) {
+    const isAllowsPrintDocument = rootGetters.posAttributes.currentPointOfSales.isAllowsPrintDocument
+    if (!isAllowsPrintDocument) {
+      return
+    }
     return printTicket({
       posUuid,
       orderUuid
