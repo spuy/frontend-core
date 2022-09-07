@@ -11,8 +11,10 @@ ENV API_URL="http://localhost:8085" \
 COPY build/start.sh .
 COPY dist/ /usr/share/nginx/html/
 
-RUN chmod +x *.sh && \
-  echo "Set Timezone..." && \
-  echo $TZ > /etc/timezone
+RUN apk add --no-cache \
+		tzdata && \ 
+    chmod +x *.sh && \
+    echo "Set Timezone..." && \
+    echo $TZ > /etc/timezone
 
 ENTRYPOINT ["sh" , "start.sh"]
