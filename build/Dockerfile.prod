@@ -11,10 +11,9 @@ ENV API_URL="http://localhost:8085" \
 COPY build/start.sh .
 COPY dist/ /usr/share/nginx/html/
 
-RUN apk add --no-cache \
-		tzdata && \ 
-    chmod +x *.sh && \
-    echo "Set Timezone..." && \
-    echo $TZ > /etc/timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \ 
+    echo $TZ > /etc/timezone && \
+    apt-get update && apt-get install -y tzdata && \
+    chmod +x *.sh
 
 ENTRYPOINT ["sh" , "start.sh"]
