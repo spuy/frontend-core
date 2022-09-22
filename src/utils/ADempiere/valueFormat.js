@@ -80,14 +80,15 @@ export function formatPrice(number, currency) {
   if (isEmptyValue(number)) {
     return undefined
   }
-  if (isEmptyValue(currency)) {
-    currency = getCurrency()
-  }
   //  Get formatted number
-  return new Intl.NumberFormat(getCountryCode(), {
-    style: 'currency',
-    currency
-  }).format(number)
+  if (!isEmptyValue(currency)) {
+    return new Intl.NumberFormat(getCountryCode(), {
+      style: 'currency',
+      currency
+    }).format(number)
+  } else {
+    return new Intl.NumberFormat(getCountryCode()).format(number)
+  }
 }
 
 //  Format Quantity
@@ -145,10 +146,10 @@ export function formatField(value, reference, optionalFormat) {
       }))
       break
     case AMOUNT.id:
-      formattedValue = formatPrice(value)
+      formattedValue = formatPrice(value, getCurrency())
       break
     case COSTS_PLUS_PRICES.id:
-      formattedValue = formatPrice(value)
+      formattedValue = formatPrice(value, getCurrency())
       break
     case NUMBER.id:
       formattedValue = formatQuantity(value)
