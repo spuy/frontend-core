@@ -170,7 +170,6 @@ adempiere-ui-client | > Listening at  http://localhost:9526/
 
 ```
 
-
 ## Sponsors
 
 <a href="http://erpya.com/">
