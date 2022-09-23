@@ -23,7 +23,7 @@ import {
   requestListAccountingCombinations,
   requestGetAccountingCombination,
   requestSaveAccountingCombination
-} from '@/api/ADempiere/field/search'
+} from '@/api/ADempiere/field/accoutingCombination'
 
 // constants
 
@@ -31,6 +31,7 @@ import {
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
 import { generatePageToken } from '@/utils/ADempiere/dataUtils'
+import { ROW_ATTRIBUTES } from '@/utils/ADempiere/tableUtils'
 // import { generateField } from '@/utils/ADempiere/dictionaryUtils'
 import { getContextAttributes } from '@/utils/ADempiere/contextUtils'
 import { isSameSize } from '@/utils/ADempiere/formatValue/iterableFormat'
@@ -89,8 +90,7 @@ const AccountCombinations = {
       containerUuid,
       currentRow = {}
     }) {
-      Vue.set(state.rowAccountCombinations, containerUuid, currentRow)
-      // Vue.set(state.rowAccountCombinations[containerUuid], 'currentRow', currentRow)
+      Vue.set(state.accountCombinations[containerUuid], 'currentRow', currentRow)
     },
 
     setAccountCombinationsShow(state, {
@@ -122,14 +122,14 @@ const AccountCombinations = {
       id,
       uuid,
       attributes,
-      contextAttributes
+      contextAttributesList
     }) {
       return new Promise(resolve => {
         return requestSaveAccountingCombination({
           id,
           uuid,
           attributes,
-          contextAttributes
+          contextAttributesList
         })
           .then(response => {
             resolve(response)
@@ -144,18 +144,22 @@ const AccountCombinations = {
       })
     },
 
-    getAccountCombination({ dispatch }, {
-      id
+    getAccountingCombination({ dispatch }, {
+      id,
+      uuid,
+      value // as combination
     }) {
       return new Promise(resolve => {
         return requestGetAccountingCombination({
-          id
+          id,
+          uuid,
+          value
         })
           .then(response => {
             resolve(response)
           })
           .catch(error => {
-            console.warn(`Get Account Combinations - Error ${error.code}: ${error.message}.`)
+            console.warn(`Get Accounting Combinations - Error ${error.code}: ${error.message}.`)
             showMessage({
               type: 'info',
               message: error.message
@@ -202,15 +206,14 @@ const AccountCombinations = {
           pageNumber
         })
           .then(response => {
-            let recordsList = []
-            if (response.recordsList) {
-              recordsList = response.recordsList.map(list => {
-                return {
-                  ...list.attributes,
-                  IdentifierTable: list.tableName
-                }
-              })
-            }
+            const recordsList = response.recordsList.map((record, rowIndex) => {
+              return {
+                ...record.attributes,
+                // datatables app attributes
+                ...ROW_ATTRIBUTES,
+                rowIndex
+              }
+            })
 
             let currentRow = {}
             // update current record
@@ -229,7 +232,7 @@ const AccountCombinations = {
               recordCount: response.recordCount
             })
 
-            resolve(response.recordsList)
+            resolve(recordsList)
           })
           .catch(error => {
             console.warn(error)
