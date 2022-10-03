@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
-// Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
+// Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A. www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com https://github.com/EdwinBetanc0urt
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import Vue from 'vue'
 
@@ -21,7 +21,7 @@ import { requestDefaultValue } from '@/api/ADempiere/user-interface/persistence.
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 // constants
-import { DISPLAY_COLUMN_PREFIX } from '@/utils/ADempiere/dictionaryUtils'
+import { DISPLAY_COLUMN_PREFIX, UNIVERSALLY_UNIQUE_IDENTIFIER_COLUMN_SUFFIX } from '@/utils/ADempiere/dictionaryUtils'
 
 // utils and helper methods
 import { isSameSize } from '@/utils/ADempiere/formatValue/iterableFormat'
@@ -140,18 +140,18 @@ const defaultValueManager = {
           value
         })
           .then(valueResponse => {
-            const values = {}
-
-            // TODO: Response from server same name key of value
-            if (valueResponse.attributes.length === 1) {
-              values.KeyColumn = valueResponse.attributes[0].value
-              values.DisplayColumn = undefined
-            } else {
-              valueResponse.attributes.forEach(attribute => {
-                const { key: column, value } = attribute
-                values[column] = value
-              })
+            const values = {
+              KeyColumn: undefined,
+              DisplayColumn: undefined,
+              UUID: undefined
             }
+
+            // do not use the convertArrayKeyValueToObject method to avoid losing a key with an empty value
+            valueResponse.attributes.forEach(attribute => {
+              const { key: column, value } = attribute
+              values[column] = value
+            })
+
             const valueOfServer = values.KeyColumn
             const displayedValue = values.DisplayColumn
 
@@ -162,7 +162,7 @@ const defaultValueManager = {
               id,
               displayedValue,
               value,
-              uuid: values.uuid
+              uuid: values.UUID
             })
 
             commit('updateValueOfField', {
@@ -179,11 +179,19 @@ const defaultValueManager = {
                 value: displayedValue
               })
             }
+            if (!isEmptyValue(values.UUID)) {
+              commit('updateValueOfField', {
+                parentUuid,
+                containerUuid,
+                columnName: columnName + UNIVERSALLY_UNIQUE_IDENTIFIER_COLUMN_SUFFIX,
+                value: values.UUID
+              })
+            }
 
             resolve({
               displayedValue,
               value: valueOfServer,
-              uuid: values.uuid
+              uuid: values.UUID
             })
           })
           .catch(error => {
