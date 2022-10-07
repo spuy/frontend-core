@@ -52,6 +52,28 @@
       :container-manager="containerManager"
       :container-uuid="reportUuid"
     />
+    <el-drawer
+      :visible.sync="isShowPanelConfig"
+      :with-header="false"
+      :before-close="handleClose"
+      size="50%"
+    >
+      <options-report
+        :container-uuid="reportUuid"
+        :container-manager="containerManager"
+      />
+    </el-drawer>
+    <el-button
+      type="primary"
+      icon="el-icon-arrow-left"
+      circle
+      style="
+        top: 50%;
+        right: 0%;
+        position: absolute;
+      "
+      @click="handleOpem()"
+    />
   </div>
 
   <loading-view
@@ -74,6 +96,7 @@ import LoadingView from '@theme/components/ADempiere/LoadingView/index.vue'
 import mixinReport from '@/views/ADempiere/Report/mixinReport.js'
 import ModalDialog from '@theme/components/ADempiere/ModalDialog/index.vue'
 import TitleAndHelp from '@theme/components/ADempiere/TitleAndHelp/index.vue'
+import OptionsReport from '@theme/components/ADempiere/FileRender/Setup/optionsReportViwer.vue'
 
 // utils and helper methods
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
@@ -90,7 +113,8 @@ export default defineComponent({
     LoadingView,
     ActionMenu,
     ModalDialog,
-    TitleAndHelp
+    TitleAndHelp,
+    OptionsReport
   },
 
   setup(props, { root }) {
@@ -106,6 +130,12 @@ export default defineComponent({
 
     const link = computed(() => {
       return getStoredReportOutput.value.link
+    })
+
+    const isShowPanelConfig = computed(() => {
+      return store.getters.getShowPanelConfig({
+        containerUuid: reportUuid
+      })
     })
 
     function displayReport(reportOutput) {
@@ -208,9 +238,26 @@ export default defineComponent({
       })
     }
 
+    function handleClose() {
+      showPanelConfigReport(false)
+    }
+
+    function handleOpem() {
+      showPanelConfigReport(!isShowPanelConfig.value)
+    }
+
+    function showPanelConfigReport(value) {
+      store.commit('setShowPanelConfig', {
+        containerUuid: reportUuid,
+        value
+      })
+    }
+
     const relationsManager = ref({
       menuParentUuid: root.$route.meta.parentUuid
     })
+
+    const drawer = ref(false)
 
     onMounted(() => {
       getReport()
@@ -224,11 +271,16 @@ export default defineComponent({
       reportContent,
       actionsManager,
       relationsManager,
+      drawer,
+      isShowPanelConfig,
       // computeds
       containerManager,
       link,
       storedReportDefinition,
-      getStoredReportOutput
+      getStoredReportOutput,
+      handleOpem,
+      handleClose,
+      showPanelConfigReport
     }
   }
 })

@@ -45,7 +45,8 @@ const initState = {
   reportViewsList: {},
   drillTablesList: {},
   reportsOutput: {},
-  reportsGenerated: {}
+  reportsGenerated: {},
+  isShowPanelConfig: {}
 }
 
 const reportManager = {
@@ -67,17 +68,21 @@ const reportManager = {
     setReportOutput(state, reportOutput) {
       Vue.set(state.reportsOutput, reportOutput.instanceUuid, reportOutput)
     },
-    setReportGenerated(state, { containerUuid, parametersList, reportType, printFormatUuid, reportViewUuid }) {
+    setReportGenerated(state, { containerUuid, parametersList, reportType, printFormatUuid, reportViewUuid, isSummary }) {
       Vue.set(state.reportsGenerated, containerUuid, {
         containerUuid,
         parametersList,
         reportType,
         printFormatUuid,
-        reportViewUuid
+        reportViewUuid,
+        isSummary
       })
     },
     resetStateReportManager(state) {
       state = initState
+    },
+    setShowPanelConfig(state, { containerUuid, value }) {
+      Vue.set(state.isShowPanelConfig, containerUuid, value)
     }
   },
 
@@ -88,6 +93,7 @@ const reportManager = {
       printFormatUuid,
       reportViewUuid,
       tableName,
+      isSummary,
       recordUuid
     }) {
       return new Promise(resolve => {
@@ -145,6 +151,7 @@ const reportManager = {
           printFormatUuid,
           reportViewUuid,
           tableName,
+          isSummary,
           recordUuid
         })
           .then(runReportRepsonse => {
@@ -511,6 +518,7 @@ const reportManager = {
       reportViewUuid,
       reportName,
       reportType,
+      isSummary,
       action,
       parametersList = []
     }) {
@@ -554,7 +562,8 @@ const reportManager = {
           containerUuid,
           reportType,
           printFormatUuid,
-          reportViewUuid
+          reportViewUuid,
+          isSummary
         })
         return
       }
@@ -568,7 +577,8 @@ const reportManager = {
           printFormatUuid,
           parametersList,
           instanceUuid,
-          reportViewUuid
+          reportViewUuid,
+          isSummary
         })
           .then(reportOutput => {
             dispatch('tagsView/updateVisitedView', {
@@ -642,6 +652,10 @@ const reportManager = {
 
     getDrillTablesList: (state) => (containerUuid) => {
       return state.drillTablesList[containerUuid] || []
+    },
+
+    getShowPanelConfig: (state) => ({ containerUuid }) => {
+      return state.isShowPanelConfig[containerUuid]
     }
   }
 }
