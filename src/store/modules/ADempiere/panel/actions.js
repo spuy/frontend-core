@@ -739,6 +739,10 @@ const actions = {
         columnName
       })
     }
+    if (isEmptyValue(field)) {
+      console.warn('field is Empty')
+      return
+    }
 
     commit('changeFieldAttribure', {
       field,

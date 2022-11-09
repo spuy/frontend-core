@@ -39,7 +39,8 @@ import {
   openSequenceTab,
   refreshRecords,
   recordAccess,
-  undoChange
+  undoChange,
+  generateAdvanceQueryPanel
 } from '@/utils/ADempiere/dictionary/window.js'
 import {
   exportRecordsSelected,
@@ -81,6 +82,7 @@ export default {
       })
         .then(async windowResponse => {
           const window = generateWindow(windowResponse)
+          generateAdvanceQueryPanel(windowResponse, 'addWindow')
           dispatch('addWindow', window)
 
           resolve(window)

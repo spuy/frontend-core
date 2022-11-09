@@ -39,18 +39,18 @@ const getters = {
     })
   },
 
-  getFieldsListFromPanel: (state, getters) => (containerUuid) => {
-    const panel = getters.getPanel(containerUuid)
-    if (isEmptyValue(panel)) {
-      return []
-    }
+  getFieldsListFromPanel: (state, getters, rootGetters) => (containerUuid, parentUuid) => {
+    const panel = rootGetters['dictionary/index'].storedWindows[parentUuid]
+    if (isEmptyValue(panel)) return []
     return panel.fieldsList
   },
 
-  getFieldFromColumnName: (state, getters) => ({ containerUuid, columnName }) => {
-    return getters.getFieldsListFromPanel(containerUuid).find(itemField => {
+  getFieldFromColumnName: (state, getters, rootState) => ({ containerUuid, parentUuid, columnName }) => {
+    const columName = getters.getFieldsListFromPanel(containerUuid).find(itemField => {
       return itemField.columnName === columnName
     })
+    if (isEmptyValue(columName)) return {}
+    return columName
   },
 
   /**

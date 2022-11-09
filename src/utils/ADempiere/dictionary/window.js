@@ -27,7 +27,7 @@ import {
   READ_ONLY_FORM_COLUMNS
 } from '@/utils/ADempiere/constants/systemColumns'
 import { ROW_ATTRIBUTES } from '@/utils/ADempiere/tableUtils'
-
+import { IS_ADVANCE_QUERY } from '@/utils/ADempiere/dictionaryUtils'
 // utils and helpers methods
 import evaluator from '@/utils/ADempiere/evaluator'
 import { getContext } from '@/utils/ADempiere/contextUtils'
@@ -43,7 +43,7 @@ import { getEntity } from '@/api/ADempiere/user-interface/persistence'
 export function isReadOnlyTab({ parentUuid, containerUuid }) {
   const { windowType } = store.getters.getStoredWindow(parentUuid)
   // window is "Only Query" type
-  if (windowType === 'Q') {
+  if (!isEmptyValue(windowType) && windowType === 'Q') {
     return true
   }
   const { isReadOnly, readOnlyLogic } = store.getters.getStoredTab(parentUuid, containerUuid)
@@ -948,6 +948,27 @@ export function generateTabs({
     tabsListChild,
     tabsList
   }
+}
+
+export function generateAdvanceQueryTabs(tabs) {
+  return tabs.map(tab => {
+    return {
+      ...tab,
+      uuid: tab.uuid + IS_ADVANCE_QUERY
+    }
+  })
+}
+
+export function generateAdvanceQueryPanel(panel, actions) {
+  const { tabs } = panel
+  const uuid = panel.uuid + IS_ADVANCE_QUERY
+  store.dispatch(actions,
+    generateWindow({
+      ...panel,
+      uuid,
+      tabs: generateAdvanceQueryTabs(tabs)
+    })
+  )
 }
 
 /**
