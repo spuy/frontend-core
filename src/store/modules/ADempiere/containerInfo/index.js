@@ -1,10 +1,28 @@
+/**
+ * ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
+ * Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A. www.erpya.com
+ * Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com https://github.com/EdwinBetanc0urt
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// api request methods
 import {
   requestListEntityLogs
 } from '@/api/ADempiere/window'
-import {
-  getAttachment
-} from '@/api/ADempiere/user-interface/resources.js'
-import { isEmptyValue, getSource } from '@/utils/ADempiere'
+
+// utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 // const initStateContainerInfo = {
 //   recordLogs: [],
@@ -26,12 +44,10 @@ const containerInfo = {
     },
     columnName: ''
   },
+
   mutations: {
     addListRecordLogs(state, payload) {
       state.listRecordLogs = payload
-    },
-    setAttachment(state, attachment) {
-      state.recordAttachment = attachment
     },
     setShowLogs(state, show) {
       state.showContainerInfo = show
@@ -53,6 +69,7 @@ const containerInfo = {
       state.fieldLogs = logs
     }
   },
+
   actions: {
     listRecordLogs({ commit }, {
       tableName,
@@ -76,41 +93,6 @@ const containerInfo = {
           commit('addListRecordLogs', {
             entityLogsList: []
           })
-          console.warn(`Error getting List Record Logs: ${error.message}. Code: ${error.code}.`)
-        })
-    },
-    findAttachment({ commit }, {
-      tableName,
-      recordId,
-      recordUuid
-    }) {
-      const pageSize = 0
-      const pageToken = 0
-      if (isEmptyValue(tableName) && (isEmptyValue(recordId) || isEmptyValue(recordUuid))) {
-        return
-      }
-      return getAttachment({
-        tableName,
-        recordId,
-        recordUuid,
-        pageSize,
-        pageToken
-      })
-        .then(response => {
-          if (response.resourceReferencesList.length > 0) {
-            const image = response.resourceReferencesList.map(element => {
-              return {
-                ...element,
-                url: getSource({ resourceUuid: element.resource_uuid, resourceName: element.file_name, resourceType: element.content_type })
-              }
-            })
-            if (image.length > 0) {
-              commit('setAttachment', image)
-            }
-          }
-          return response
-        })
-        .catch(error => {
           console.warn(`Error getting List Record Logs: ${error.message}. Code: ${error.code}.`)
         })
     },
@@ -171,12 +153,10 @@ const containerInfo = {
         })
     }
   },
+
   getters: {
     getRecordLogs: (state) => {
       return state.listRecordLogs
-    },
-    getAttachment: (state) => {
-      return state.recordAttachment
     },
     getShowLogs: (state) => {
       return state.showContainerInfo
