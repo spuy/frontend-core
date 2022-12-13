@@ -1,11 +1,11 @@
 <template>
-  <section id="appMain" class="app-main">
-    <transition name="fade-transform" mode="out-in">
-      <keep-alive :include="cachedViews">
-        <router-view :key="key" />
-      </keep-alive>
-    </transition>
-  </section>
+  <!-- <div id="appMain" class="app-main"> -->
+  <transition name="fade-transform" mode="out-in">
+    <keep-alive :include="cachedViews">
+      <router-view :key="key" />
+    </keep-alive>
+  </transition>
+  <!-- </div> -->
 </template>
 
 <script>
