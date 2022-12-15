@@ -17,8 +17,8 @@
 -->
 
 <template>
-  <el-container v-if="!isLoadWindows" style="height: 100%!important;">
-    <el-main id="mainWindow" :style="(isMobile || isEmptyValue(windowMetadata.tabsListChild)) ? 'overflow: hidden;' : 'overflow: hidden;'">
+  <div style="height: 100% !important;width: 100% !important;">
+    <div id="tab-manager" :style="sizeTab">
       <embedded
         :visible="showRecordAccess"
       >
@@ -51,8 +51,8 @@
         :parent-uuid="currentTabUuid"
         :container-uuid="processUuid"
       />
-    </el-main>
-    <el-footer v-if="isWithChildsTab && !isMobile && !(settingsFullGridMode && windowMetadata.currentTab.isParentTab && windowMetadata.currentTab.isShowedTableRecords)" id="footerWindow" :style="styleFullScreen">
+    </div>
+    <div v-if="isWithChildsTab" id="tab-manager-child" :style="sizeTabChild">
       <tab-manager-child
         class="tab-manager"
         :parent-uuid="windowMetadata.uuid"
@@ -62,12 +62,8 @@
         :references-manager="referencesManager"
         :actions-manager="actionsManager"
       />
-    </el-footer>
-  </el-container>
-  <loading-view
-    v-else
-    key="process-loading"
-  />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -87,6 +83,7 @@ import LoadingView from '@theme/components/ADempiere/LoadingView/index.vue'
 
 // utils and helpers methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import useFullScreenContainer from '@theme/components/ADempiere/ContainerOptions/FullScreenContainer/useFullScreenContainer'
 
 export default defineComponent({
   name: 'DocumentWindow',
@@ -121,11 +118,39 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
+    /**
+     * Const
+     */
+
+    const containerManager = {
+      ...props.windowManager
+    }
+
+    /**
+     * Ref
+     */
+
+    const allTabsList = ref([])
+
+    const isLoadWindows = ref(false)
+
+    const index = ref(0)
+
+    const referencesManager = ref({
+      getTableName: () => {
+        const tabUuid = currentTabUuid.value
+        const windowUuid = props.windowMetadata.uuid
+        return store.getters.getTableName(windowUuid, tabUuid)
+      }
+    })
+
+    const additionalOptions = ref({})
+    /**
+     * Computed
+     */
     const isWithChildsTab = computed(() => {
       return !isEmptyValue(props.windowMetadata.tabsListChild)
     })
-
-    const allTabsList = ref([])
 
     const showRecordAccess = computed(() => {
       return store.getters.getShowPanelRecordAccess
@@ -157,10 +182,6 @@ export default defineComponent({
       return 'height: 50% !important'
     })
 
-    const containerManager = {
-      ...props.windowManager
-    }
-
     const actionsManager = computed(() => {
       return {
         parentUuid: props.windowMetadata.uuid,
@@ -175,33 +196,49 @@ export default defineComponent({
       }
     })
 
+    const isViewFullScreenChild = computed(() => {
+      const { isViewFullScreenChild } = useFullScreenContainer({
+        parentUuid: props.windowMetadata.currentTabChild.parentUuid,
+        containerUuid: props.windowMetadata.currentTabChild.containerUuid
+      })
+      return isViewFullScreenChild.value
+    })
+
+    const isViewFullScreenParent = computed(() => {
+      const { isViewFullScreenParent } = useFullScreenContainer({
+        parentUuid: props.windowMetadata.currentTab.parentUuid,
+        containerUuid: props.windowMetadata.currentTab.containerUuid
+      })
+      return isViewFullScreenParent.value
+    })
+
+    const sizeTab = computed(() => {
+      if (!isWithChildsTab.value) return 'height: 100% !important'
+      if (isViewFullScreenParent.value) return 'height: 66% !important'
+      return 'height: 50% !important'
+    })
+
+    const sizeTabChild = computed(() => {
+      if (isViewFullScreenChild.value) return 'height: 66% !important'
+      return 'height: 50% !important'
+    })
+
     const isFullGrid = computed(() => {
       return props.windowMetadata.currentTab.isParentTab && props.windowMetadata.currentTab.isShowedTableRecords
     })
-    const isLoadWindows = ref(false)
-    const index = ref(0)
 
-    const referencesManager = ref({
-      getTableName: () => {
-        const tabUuid = currentTabUuid.value
-        const windowUuid = props.windowMetadata.uuid
-        return store.getters.getTableName(windowUuid, tabUuid)
+    // Load data document options
+    const listDocumentActions = computed(() => {
+      const alo = store.getters.getListDocumentActions
+      if (isEmptyValue(alo)) {
+        return []
       }
+      return store.getters.getListDocumentActions
     })
 
     if (props.windowMetadata.tabsList) {
       allTabsList.value = props.windowMetadata.tabsList
     }
-
-    watch(isFullGrid, (newValue, oldValue) => {
-      if (settingsFullGridMode.value && !newValue && isWithChildsTab.value && index.value === 0) {
-        index.value = 1
-        isLoadWindows.value = true
-        setTimeout(() => {
-          isLoadWindows.value = false
-        }, 500)
-      }
-    })
 
     const recordUuid = computed(() => {
       const record = store.getters.getUuidOfContainer(currentTabUuid.value)
@@ -211,8 +248,10 @@ export default defineComponent({
       }
       return isEmptyValue(record) ? action : record
     })
-    const additionalOptions = ref({})
 
+    /**
+     * Methods
+     */
     function loaDocument() {
       if (isEmptyValue(recordUuid.value) || recordUuid.value === 'create-new') {
         return
@@ -229,16 +268,21 @@ export default defineComponent({
           }
         })
     }
-    // additionalOptions.value = listDocumentActions.value
 
-    // Load data document options
-    const listDocumentActions = computed(() => {
-      const alo = store.getters.getListDocumentActions
-      if (isEmptyValue(alo)) {
-        return []
+    /**
+     * Watch
+     */
+
+    watch(isFullGrid, (newValue, oldValue) => {
+      if (settingsFullGridMode.value && !newValue && isWithChildsTab.value && index.value === 0) {
+        index.value = 1
+        isLoadWindows.value = true
+        setTimeout(() => {
+          isLoadWindows.value = false
+        }, 500)
       }
-      return store.getters.getListDocumentActions
     })
+
     watch(listDocumentActions, (newValue, oldValue) => {
       if (!isEmptyValue(additionalOptions.value.currentDocument) &&
         !isEmptyValue(listDocumentActions.value.defaultDocumentAction) &&
@@ -259,6 +303,7 @@ export default defineComponent({
           })
       }
     })
+
     watch(recordUuid, (newValue, oldValue) => {
       if (newValue !== oldValue && !isEmptyValue(newValue) && newValue !== 'create-new') {
         loaDocument()
@@ -276,26 +321,35 @@ export default defineComponent({
           })
       }
     })
+    // additionalOptions.value = listDocumentActions.value
     loaDocument()
 
     return {
-      recordUuid,
-      currentTabUuid,
-      allTabsList,
-      referencesManager,
-      actionsManager,
-      showRecordAccess,
-      isWithChildsTab,
+      // Const
       containerManager,
-      isMobile,
-      styleFullScreen,
-      loaDocument,
-      additionalOptions,
-      settingsFullGridMode,
-      listDocumentActions,
-      isFullGrid,
+      // Refs
+      allTabsList,
+      isLoadWindows,
       index,
-      isLoadWindows
+      referencesManager,
+      additionalOptions,
+      // Computed
+      isWithChildsTab,
+      showRecordAccess,
+      settingsFullGridMode,
+      isMobile,
+      currentTabUuid,
+      styleFullScreen,
+      actionsManager,
+      isFullGrid,
+      listDocumentActions,
+      recordUuid,
+      isViewFullScreenChild,
+      isViewFullScreenParent,
+      sizeTab,
+      sizeTabChild,
+      // Methods
+      loaDocument
     }
   }
 

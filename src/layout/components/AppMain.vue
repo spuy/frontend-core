@@ -1,11 +1,11 @@
 <template>
-  <!-- <div id="appMain" class="app-main"> -->
-  <transition name="fade-transform" mode="out-in">
-    <keep-alive :include="cachedViews">
-      <router-view :key="key" />
-    </keep-alive>
-  </transition>
-  <!-- </div> -->
+  <section id="appMainLayout" style="height: 90% !important;display: initial;position: absolute;width: 100% !important;">
+    <transition name="fade-transform" mode="out-in">
+      <keep-alive :include="cachedViews">
+        <router-view :key="key" style="height: 100% !important;width: 100% !important;display: flow-root;sss" />
+      </keep-alive>
+    </transition>
+  </section>
 </template>
 
 <script>
@@ -69,5 +69,12 @@ export default {
   .fixed-header {
     padding-right: 15px;
   }
+}
+.el-tabs--border-card > .el-tabs__content {
+  padding: 1, 0, 1, 15px;
+  overflow: auto;
+  // padding-top: 0px;
+  height: 86%;
+  // padding-bottom: 0px;
 }
 </style>
