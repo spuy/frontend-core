@@ -23,7 +23,35 @@ const VPayPrint = {
   paymentRule: 'Regla de Pago',
   currency: 'Moneda',
   documentNo: 'Numero de Documento',
-  numberPayments: 'Número de Pagos'
+  numberPayments: 'Número de Pagos',
+  nextSequence: 'Siguiente Secuencia',
+  buttons: {
+    labelPanel: '¿Qué desea hacer?',
+    print: 'Imprimir',
+    toExport: 'Exportar',
+    processOnLine: 'Transferencia'
+  },
+  headerTable: {
+    title: 'Detalle del Lote',
+    provider: 'Proveedor',
+    invoice: 'OV/Factura',
+    grandTotal: 'Gran Total',
+    subscriber: 'Abonado',
+    payable: 'Monto a Pagar',
+    pending: 'Pendiente'
+  },
+  message: {
+    paymentRule: {
+      onCredit: 'A Crédito',
+      check: 'Cheque',
+      directDeposit: 'Depósito Directo',
+      directDebit: 'Débito Directo',
+      creditCard: 'Tarjeta De Crédito'
+    },
+    processMessage: 'Desea Procesar Todos los Pagos tipo ',
+    printMessage: 'Desea Imprimir Todos los Pagos tipo ',
+    ExportMessage: 'Desea Exportar Todos los Pagos tipo '
+  }
 }
 
 export default VPayPrint
