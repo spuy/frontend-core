@@ -18,8 +18,8 @@
 
 <template>
   <div v-if="isLoaded" key="window-loaded" class="view-base">
-    <el-container style="height: 100% !important;">
-      <el-aside style="width: 100%; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; padding-right: 10px; padding-left: 3px;overflow: auto;">
+    <el-container style="height: 100% !important;display: block;">
+      <el-aside :style="styleContainer">
         <component
           :is="renderWindowComponent"
           :window-manager="containerManagerWindow"
@@ -39,13 +39,14 @@
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
+
 import store from '@/store'
 
-// components and mixins
+// Components and Mixins
 import LoadingView from '@theme/components/ADempiere/LoadingView/index.vue'
 import mixinProcess from '@/views/ADempiere/Process/mixinProcess.js'
 
-// utils and helper methods
+// Utils and Helper Methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import {
@@ -100,6 +101,24 @@ export default defineComponent({
 
     const storedWindow = computed(() => {
       return store.getters.getStoredWindow(windowUuid)
+    })
+
+    const styleContainer = computed(() => {
+      const getFullGridMode = store.getters['settings/getFullGridMode']
+      if (currentTab.value.isShowedTableRecords && getFullGridMode) {
+        return 'width: 100%; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; padding-right: 10px; padding-left: 3px;overflow: auto;display: contents'
+      }
+      if (isEmptyValue(currentTab.value.childTabs)) {
+        return 'width: 100%; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; padding-right: 10px; padding-left: 3px;overflow: auto;display: contents'
+      }
+      if (storedWindow.value.isFullScreenTabsParent || storedWindow.value.isFullScreenTabsChildren) {
+        return 'width: 100%; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; padding-right: 10px; padding-left: 3px;overflow: auto;'
+      }
+      return 'width: 100%; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; padding-right: 10px; padding-left: 3px;overflow: auto;height: 100%;'
+    })
+
+    const currentTab = computed(() => {
+      return store.getters.getStoredWindow(windowUuid).currentTab
     })
 
     function setLoadWindow(window) {
@@ -188,7 +207,9 @@ export default defineComponent({
       // computed
       processWindowsUuid,
       renderWindowComponent,
-      isLoaded
+      isLoaded,
+      styleContainer,
+      currentTab
     }
   }
 })
