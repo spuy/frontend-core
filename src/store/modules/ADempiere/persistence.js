@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -20,18 +20,18 @@ import Vue from 'vue'
 
 import language from '@/lang'
 
-// constants
+// Constants
 import { LOG_COLUMNS_NAME_LIST, UUID } from '@/utils/ADempiere/constants/systemColumns'
 import { ROW_ATTRIBUTES } from '@/utils/ADempiere/tableUtils'
 import { DISPLAY_COLUMN_PREFIX, IDENTIFIER_COLUMN_SUFFIX } from '@/utils/ADempiere/dictionaryUtils'
 
-// api request methods
+// API Request Methods
 import {
   createEntity,
   updateEntity
-} from '@/api/ADempiere/common/persistence.js'
+} from '@/api/ADempiere/user-interface/persistence'
 
-// utils and helper methods
+// Utils and Helper Methods
 import { isEmptyValue, isSameValues } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
 import { getContextDefaultValue } from '@/utils/ADempiere/dictionaryUtils.js'
@@ -245,7 +245,7 @@ const persistence = {
           if (!isEmptyValue(recordUuid)) {
             // Update existing entity
             return updateEntity({
-              tableName,
+              tabUuid: containerUuid,
               recordUuid,
               attributesList
             })
@@ -289,7 +289,7 @@ const persistence = {
 
             // Create new entity
             return createEntity({
-              tableName,
+              tabUuid: containerUuid,
               attributesList
             })
               .then(response => {

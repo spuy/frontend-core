@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -20,19 +20,20 @@ import Vue from 'vue'
 import language from '@/lang'
 import router from '@/router'
 
-// api request methods
+// API Request Methods
 import {
-  getEntities
+  getEntities,
+  updateEntity
 } from '@/api/ADempiere/user-interface/persistence.js'
 import {
-  updateEntity,
   deleteEntity
 } from '@/api/ADempiere/common/persistence.js'
-// constants
+
+// Constants
 import { UUID } from '@/utils/ADempiere/constants/systemColumns'
 import { ROW_ATTRIBUTES } from '@/utils/ADempiere/tableUtils'
 
-// utils and helper methods
+// Utils and Helper Methods
 import { containerManager } from '@/utils/ADempiere/dictionary/window'
 import { getContextAttributes, generateContextKey } from '@/utils/ADempiere/contextUtils.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
@@ -561,7 +562,6 @@ const windowManager = {
     updateRowTableWindows({ commit, dispatch, getters }, {
       parentUuid,
       containerUuid,
-      tableName,
       recordUuid,
       attributesList
     }) {
@@ -581,7 +581,7 @@ const windowManager = {
       })
       return new Promise((resolve, reject) => {
         updateEntity({
-          tableName,
+          tabUuid: containerUuid,
           recordUuid,
           attributesList
         })
