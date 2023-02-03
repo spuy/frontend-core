@@ -9,23 +9,24 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 import Vue from 'vue'
 
-// api request methods
+// API Request Methods
 import { tableSearchFields, requestGridGeneralInfo } from '@/api/ADempiere/field/search'
 
-// constants
+// Constants
 import { CHAR, SEARCH, TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references'
 import { TABLE_NAME as TABLE_NAME_BPartner } from '@/utils/ADempiere/dictionary/form/businessPartner/businessPartnerList'
+import { ROWS_OF_RECORDS_BY_PAGE } from '@/utils/ADempiere/tableUtils'
 
-// utils and helper methods
+// Utils and Helper Methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
 import { generatePageToken } from '@/utils/ADempiere/dataUtils'
@@ -49,6 +50,7 @@ const initState = {
     isLoaded: false,
     show: false,
     list: [],
+    pageSize: ROWS_OF_RECORDS_BY_PAGE,
     pageNumber: 1
   },
   generalInfoSearch: {},
@@ -69,7 +71,8 @@ const generalInfoSearch = {
       recordCount = 0,
       isLoaded = true,
       show = false,
-      pageNumber = 1
+      pageNumber = 1,
+      pageSize = ROWS_OF_RECORDS_BY_PAGE
     }) {
       Vue.set(state.generalInfoSearch, containerUuid, {
         containerUuid,
@@ -79,7 +82,8 @@ const generalInfoSearch = {
         nextPageToken,
         recordCount,
         isLoaded,
-        pageNumber
+        pageNumber,
+        pageSize
       })
     },
     setGeneralInfoSelectedRow(state, {
@@ -142,7 +146,8 @@ const generalInfoSearch = {
       //
       filters,
       searchValue,
-      pageNumber
+      pageNumber,
+      pageSize
     }) {
       return new Promise(resolve => {
         if (tableName === TABLE_NAME_BPartner) {
@@ -161,7 +166,8 @@ const generalInfoSearch = {
             //
             filters,
             searchValue,
-            pageNumber
+            pageNumber,
+            pageSize
           }).then(response => {
             resolve(response)
           })
@@ -181,7 +187,8 @@ const generalInfoSearch = {
           tableName,
           columnName,
           //
-          pageNumber
+          pageNumber,
+          pageSize
         }).then(response => {
           resolve(response)
         })
@@ -203,7 +210,8 @@ const generalInfoSearch = {
       tableName,
       columnName,
       //
-      pageNumber
+      pageNumber,
+      pageSize
     }) {
       return new Promise(resolve => {
         if (isEmptyValue(pageNumber) || pageNumber < 1) {
@@ -238,7 +246,8 @@ const generalInfoSearch = {
           tableName,
           columnName,
           //
-          pageToken
+          pageToken,
+          pageSize
         })
           .then(response => {
             dispatch('searchTableHeader', {
@@ -269,7 +278,8 @@ const generalInfoSearch = {
               nextPageToken: response.nextPageToken,
               pageNumber,
               isLoaded: true,
-              recordCount: response.recordCount
+              recordCount: response.recordCount,
+              pageSize
             })
 
             resolve(recordsList)

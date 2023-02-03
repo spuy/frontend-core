@@ -1706,7 +1706,7 @@ export const containerManager = {
       blankValue
     })
   },
-  getSearchInfoList({ parentUuid, containerUuid, contextColumnNames, tableName, columnName, uuid, filters, searchValue }) {
+  getSearchInfoList({ parentUuid, containerUuid, contextColumnNames, tableName, columnName, pageNumber, uuid, filters, searchValue, pageSize }) {
     return store.dispatch('searchInfoList', {
       parentUuid,
       containerUuid,
@@ -1715,7 +1715,9 @@ export const containerManager = {
       tableName,
       columnName,
       filters,
-      searchValue
+      searchValue,
+      pageNumber,
+      pageSize
     })
   },
 
@@ -1767,7 +1769,8 @@ export const containerManager = {
     searchValue,
     tableName,
     columnName,
-    pageNumber
+    pageNumber,
+    pageSize
   }) {
     return store.dispatch('findGeneralInfo', {
       containerUuid,
@@ -1778,7 +1781,8 @@ export const containerManager = {
       searchValue,
       tableName,
       columnName,
-      pageNumber
+      pageNumber,
+      pageSize
     })
   },
   searchTableHeader({

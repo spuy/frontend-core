@@ -9,22 +9,23 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 import Vue from 'vue'
 
-// api request methods
+// API Request Methods
 import { requestListBusinessPartner } from '@/api/ADempiere/businessPartner'
 
-// constants
+// Constants
 import { ROW_ATTRIBUTES } from '@/utils/ADempiere/tableUtils'
+import { ROWS_OF_RECORDS_BY_PAGE } from '@/utils/ADempiere/tableUtils'
 
-// utils and helper methods
+// Utils and Helper Methods
 import { isSalesTransaction } from '@/utils/ADempiere/contextUtils'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
@@ -45,6 +46,7 @@ const initState = {
     recordCount: 0,
     isLoaded: false,
     BPshow: false,
+    pageSize: ROWS_OF_RECORDS_BY_PAGE,
     pageNumber: 1
   },
   businessPartnerData: {},
@@ -63,7 +65,8 @@ const businessPartner = {
       recordCount = 0,
       isLoaded = true,
       BPshow = false,
-      pageNumber = 1
+      pageNumber = 1,
+      pageSize = ROWS_OF_RECORDS_BY_PAGE
     }) {
       Vue.set(state.businessPartnerData, containerUuid, {
         containerUuid,
@@ -73,7 +76,8 @@ const businessPartner = {
         nextPageToken,
         recordCount,
         isLoaded,
-        pageNumber
+        pageNumber,
+        pageSize
       })
     },
     setBusinessPartnerSelectedRow(state, {
@@ -117,7 +121,8 @@ const businessPartner = {
       //
       filters = [],
       searchValue,
-      pageNumber
+      pageNumber,
+      pageSize
     }) {
       return new Promise(resolve => {
         if (isEmptyValue(pageNumber) || pageNumber < 1) {
@@ -158,7 +163,8 @@ const businessPartner = {
           // Query
           filters,
           searchValue,
-          pageToken
+          pageToken,
+          pageSize
         })
           .then(responseBusinessPartnerList => {
             const recordsList = responseBusinessPartnerList.recordsList.map((record, rowIndex) => {
@@ -183,6 +189,7 @@ const businessPartner = {
               recordsList,
               nextPageToken: responseBusinessPartnerList.nextPageToken,
               pageNumber,
+              pageSize,
               isLoaded: true,
               recordCount: responseBusinessPartnerList.recordCount
             })
