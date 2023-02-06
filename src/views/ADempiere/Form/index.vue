@@ -9,11 +9,11 @@
 
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program.  If not, see <https:www.gnu.org/licenses/>.
+ along with this program. If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
   <div style="height: 100vh;overflow: auto;">
@@ -23,18 +23,6 @@
       :class="showNavar ? 'view-base' : 'show-header-view-base'"
       style="height: 100vh;"
     >
-      <el-header
-        v-if="showContextMenu"
-        style="height: 39px; background: white;"
-      >
-        <!-- TODO: Add action menu -->
-
-        <modal-dialog
-          :parent-uuid="$route.meta.parentUuid"
-          :container-uuid="formUuid"
-          :panel-type="panelType"
-        />
-      </el-header>
       <el-main style="padding-right: 0px !important; padding-bottom: 0px !important;padding-top: 0px !important;padding-left: 0px !important;">
         <el-row>
           <el-col :span="24">
@@ -85,10 +73,10 @@
 </template>
 
 <script>
-// components and mixins
+// Components and Mixins
 import FormPanel from '@theme/components/ADempiere/Form'
 import LoadingView from '@theme/components/ADempiere/LoadingView/index.vue'
-import ModalDialog from '@theme/components/ADempiere/Dialog'
+// import ModalDialog from '@theme/components/ADempiere/Dialog'
 import TitleAndHelp from '@theme/components/ADempiere/TitleAndHelp'
 
 export default {
@@ -97,7 +85,7 @@ export default {
   components: {
     FormPanel,
     LoadingView,
-    ModalDialog,
+    // ModalDialog,
     TitleAndHelp
   },
 
