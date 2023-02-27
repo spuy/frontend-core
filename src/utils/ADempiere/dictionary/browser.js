@@ -82,6 +82,33 @@ export function isReadOnlyField({ isQueryCriteria, isReadOnlyFromLogic }) {
   return isQueryCriteria && isReadOnlyFromLogic
 }
 
+export function evaluateDefaultColumnShowed({
+  isKey, isActive, displayType, isDisplayed, isShowedTableFromUser,
+  isMandatory, isMandatoryFromLogic, mandatoryLogic
+}) {
+  // const isDisplayedColumnGenerated = isDisplayedColumn({
+  //   isKey,
+  //   isActive,
+  //   displayType,
+  //   isDisplayed,
+  //   isMandatory,
+  //   isMandatoryFromLogic,
+  //   mandatoryLogic
+  // })
+  // if (!isDisplayedColumnGenerated) {
+  //   return
+  // }
+  // const isMandatoryGenerated = isMandatoryColumn({
+  //   displayType, isMandatory, isMandatoryFromLogic, mandatoryLogic
+  // })
+  // if (isMandatoryGenerated) {
+  //   return true
+  // }
+
+  // return Boolean(isShowedTableFromUser)
+  return true
+}
+
 /**
  * Is displayed column in table multi record
  */
@@ -342,13 +369,22 @@ export const containerManager = {
     }
     return false
   },
+  isDisplayedColumn,
 
   isMandatoryField,
+  isMandatoryColumn,
 
   isReadOnlyField,
 
   changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
     store.dispatch('changeBrowserFieldShowedFromUser', {
+      containerUuid,
+      fieldsShowed
+    })
+  },
+  changeColumnShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
+    store.dispatch('changeBrowseColumnShowedFromUser', {
+      parentUuid,
       containerUuid,
       fieldsShowed
     })
@@ -383,6 +419,51 @@ export const containerManager = {
   getPageNumber({ containerUuid }) {
     return store.getters.getBrowserPageNumber({
       containerUuid
+    })
+  },
+
+  setRow: ({ containerUuid, rowIndex, row }) => {
+    return store.commit('setBrowserRow', {
+      containerUuid,
+      rowIndex,
+      row
+    })
+  },
+  getRow: ({ containerUuid, rowIndex }) => {
+    return store.getters.getBrowserRowData({
+      containerUuid,
+      rowIndex
+    })
+  },
+
+  setCell: ({ containerUuid, rowIndex, columnName, value }) => {
+    return store.commit('setBrowserCell', {
+      containerUuid,
+      rowIndex,
+      columnName,
+      value
+    })
+  },
+  getCell: ({ containerUuid, rowIndex, columnName }) => {
+    return store.getters.getBrowserCellData({
+      containerUuid,
+      rowIndex,
+      columnName
+    })
+  },
+
+  setPage: ({ containerUuid, pageNumber, pageSize }) => {
+    store.dispatch('getBrowserSearch', {
+      containerUuid,
+      pageSize,
+      pageNumber
+    })
+  },
+  setSizePage: ({ containerUuid, pageSize, pageNumber = 1 }) => {
+    store.dispatch('getBrowserSearch', {
+      containerUuid,
+      pageNumber,
+      pageSize
     })
   },
 
