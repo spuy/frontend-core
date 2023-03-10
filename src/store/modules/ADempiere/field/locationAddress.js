@@ -28,6 +28,7 @@ const initState = {
   countries: {},
   isShowedLocation: false,
   fieldsListLocation: [],
+  fieldsListLocationAddress: {},
   fieldsListLocationShipping: [],
   fieldsListLocationBilling: []
 }
@@ -42,14 +43,17 @@ const locationAddress = {
     setShowedLocation(state, isShowed) {
       state.isShowedLocation = isShowed
     },
+    setFieldsListLocationAddress(state, { containerUuid, fieldsList }) {
+      Vue.set(state.fieldsListLocationAddress, containerUuid, fieldsList)
+    },
     setFieldsListLocation(state, fieldsListLocation) {
       state.fieldsListLocation = fieldsListLocation
     },
-    setFieldsListLocationShipping(state, fieldsListLocation) {
-      state.fieldsListLocationShipping = fieldsListLocation
+    setFieldsListLocationShipping(state, fieldsListLocationShipping) {
+      state.fieldsListLocationShipping = fieldsListLocationShipping
     },
-    setFieldsListLocationBilling(state, fieldsListLocation) {
-      state.fieldsListLocationBilling = fieldsListLocation
+    setFieldsListLocationBilling(state, fieldsListLocationBilling) {
+      state.fieldsListLocationBilling = fieldsListLocationBilling
     },
     resetStateLocation(state) {
       state = initState
@@ -105,6 +109,9 @@ const locationAddress = {
     },
     getFieldLocation: (state) => {
       return state.fieldsListLocation
+    },
+    getFieldLocationAddress: (state) => ({ containerUuid }) => {
+      return state.fieldsListLocationAddress[containerUuid] || []
     },
     getFieldsListLocationShipping: (state) => {
       return state.fieldsListLocationShipping
