@@ -26,7 +26,8 @@ import {
   requestLogin,
   requestLogout,
   requestUserInfoFromSession,
-  requestSessionInfo
+  requestSessionInfo,
+  setSessionAttribute
 } from '@/api/user'
 import {
   requestRolesList,
@@ -457,7 +458,6 @@ const actions = {
     })
       .then(response => {
         commit('SET_WAREHOUSES_LIST', response.warehousesList)
-
         let warehouse = response.warehousesList.find(item => item.uuid === getCurrentWarehouse())
         if (isEmptyValue(warehouse)) {
           warehouse = response.warehousesList[0]
@@ -481,7 +481,8 @@ const actions = {
       })
   },
 
-  changeWarehouse({ commit, state }, {
+  changeWarehouse({ commit, state, dispatch }, {
+    warehouseId,
     warehouseUuid
   }) {
     setCurrentWarehouse(warehouseUuid)
@@ -495,6 +496,14 @@ const actions = {
     }, {
       root: true
     })
+    setSessionAttribute({
+      warehouseId: currentWarehouse.id,
+      warehouseUuid: currentWarehouse.uuid
+    })
+      .then(token => {
+        setToken(token)
+        location.reload()
+      })
   },
 
   // dynamically modify permissions
