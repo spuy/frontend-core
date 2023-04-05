@@ -47,8 +47,6 @@ import timeControl from './form/timeControl'
 import VPayPrint from './form/VPayPrint'
 import VBankStatementMatch from './form/VBankStatementMatch'
 
-console.log({ ...form })
-
 export default {
   actionMenu,
   businessPartner,
