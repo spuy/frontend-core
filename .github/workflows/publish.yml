@@ -149,6 +149,11 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
+      - name: Download build dist app
+        uses: actions/download-artifact@v3
+        with:
+          name: adempiere-vue
+          path: dist
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -161,7 +166,7 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v3.2.0
         with:
           context: .
           file: ./build/production.Dockerfile
