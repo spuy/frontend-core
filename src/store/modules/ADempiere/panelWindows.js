@@ -17,6 +17,7 @@
  */
 
 // import lang from '@/lang'
+import Vue from 'vue'
 
 // API Request Methods
 import {
@@ -24,16 +25,17 @@ import {
   ListWindowCharts,
   getWindowMetrics
 } from '@/api/ADempiere/dashboard/panelWindows.js'
-// import { isEmptyValue } from '@/utils/ADempiere'
 
 // Utils and Helper Methods
 // import { showMessage } from '@/utils/ADempiere/notification.js'
+import { isEmptyValue } from '@/utils/ADempiere'
 import { getContextAttributes } from '@/utils/ADempiere/contextUtils'
 
 const panelWindows = {
   dashboard: 0,
   listDashboard: [],
-  metrics: []
+  metrics: [],
+  dashboardList: {}
 }
 
 export default {
@@ -47,6 +49,10 @@ export default {
     },
     setMetrics(state, metrics) {
       state.metrics = metrics
+    },
+    setPanelDashboardTab(state, dashboard) {
+      const { tabId, list } = dashboard
+      Vue.set(state.dashboardList, tabId, list)
     }
   },
   actions: {
@@ -114,11 +120,12 @@ export default {
               }
             })
             commit('setListDashboard', list)
+            const dashboard = { tabId, recordId, list }
+            commit('setPanelDashboardTab', dashboard)
             resolve(list)
           })
           .catch(error => {
             resolve(0)
-            // commit('setListProduct', [])
             console.warn(`Error getting List Product: ${error.message}. Code: ${error.code}.`)
           })
       })
@@ -156,6 +163,15 @@ export default {
     },
     getNumberDashboard(state) {
       return state.dashboard
+    },
+    getPanelDashboard: (state) => ({ tabId, recordId }) => {
+      let dashboardList = []
+      if (!isEmptyValue(state.dashboardList)) {
+        if (!isEmptyValue(state.dashboardList[tabId])) {
+          dashboardList = state.dashboardList[tabId]
+        }
+      }
+      return dashboardList
     }
   }
 }
