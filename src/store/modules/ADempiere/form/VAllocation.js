@@ -18,11 +18,13 @@
 
 // API Request Methods
 import {
+  process,
   listPayments,
   listInvoices
 } from '@/api/ADempiere/form/VAllocation.js'
 
 // Utils and Helper Methods
+import { isEmptyValue } from '@/utils/ADempiere'
 import { dateTimeFormats } from '@/utils/ADempiere/formatValue/dateFormat'
 
 const VAllocation = {
@@ -31,7 +33,9 @@ const VAllocation = {
     organizationId: '',
     currencyId: '',
     date: '',
-    transactionType: ''
+    transactionType: '',
+    description: '',
+    chargeId: ''
   },
   listRecord: {
     payments: [],
@@ -40,6 +44,22 @@ const VAllocation = {
   selectListRecord: {
     payments: [],
     invoce: []
+  },
+  difference: {
+    amount: 0,
+    transactionType: ''
+  },
+  listAllDifference: [],
+  list: {
+    payments: [],
+    invoces: []
+  },
+  process: {
+    date: '',
+    chargeId: '',
+    description: '',
+    totalDifference: 0,
+    transactionOrganizationId: ''
   }
 }
 
@@ -75,7 +95,32 @@ export default {
     },
     setSelectListInvoces(state, listSelect) {
       state.selectListRecord.invoce = listSelect
+    },
+    setDiference(state, {
+      attribute,
+      value
+    }) {
+      state.difference[attribute] = value
+    },
+    setProcess(state, {
+      attribute,
+      value
+    }) {
+      state.process[attribute] = value
+    },
+    setListDifference(state) {
+      const payments = state.list.payments
+      const invoces = state.list.invoces
+      const list = payments.concat(invoces)
+      state.listAllDifference = list
+    },
+    setListSelectPayments(state, list) {
+      state.list.payments = list
+    },
+    setListSelectInvoices(state, list) {
+      state.list.invoces = list
     }
+
   },
   actions: {
     findListPayment({ commit, state }) {
@@ -170,6 +215,41 @@ export default {
             console.warn(`Error getting List Product: ${error.message}. Code: ${error.code}.`)
           })
       })
+    },
+    processSend({ dispatch, state }) {
+      return new Promise(resolve => {
+        const {
+          currencyId,
+          businessPartnerId
+        } = state.searchCriteria
+        const {
+          date,
+          chargeId,
+          description,
+          totalDifference,
+          transactionOrganizationId
+        } = state.process
+        process({
+          date,
+          chargeId,
+          currencyId,
+          description,
+          totalDifference,
+          businessPartnerId,
+          invoiceSelectionList: state.list.invoces,
+          paymentSelectionsList: state.list.payments,
+          transactionOrganizationId
+        })
+          .then(response => {
+            dispatch('findListPayment')
+            dispatch('findListInvoices')
+            resolve(response)
+          })
+          .catch(error => {
+            resolve([])
+            console.warn(`Error getting List Product: ${error.message}. Code: ${error.code}.`)
+          })
+      })
     }
   },
   getters: {
@@ -180,10 +260,28 @@ export default {
       return state.listRecord
     },
     getSelectListPayments(state) {
-      return state.listRecord.payments.filter(list => list.isSelect)
+      return state.selectListRecord.payments
     },
     getSelectListInvoces(state) {
-      return state.listRecord.invoce.filter(list => list.isSelect)
+      return state.selectListRecord.invoce
+    },
+    getListDifference(state) {
+      const payments = state.list.payments
+      const invoces = state.list.invoces
+      if (isEmptyValue(payments) && isEmptyValue(invoces)) {
+        return []
+      }
+      return payments.concat(invoces).map(list => {
+        const date = Object.keys(list).find(key => key.includes('date'))
+        return {
+          transactionDate: list[date],
+          transactionType: list.transaction_type.value,
+          amount: list.applied
+        }
+      })
+    },
+    getProcess(state) {
+      return state.process
     }
   }
 }
