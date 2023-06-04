@@ -263,12 +263,26 @@ const windowManager = {
         const storedPage = getters.getTabPageNumber({
           containerUuid
         })
+
         let pageToken
+
+        const {
+          name,
+          isHasTree,
+          fieldsList,
+          linkColumnName,
+          parentColumnName,
+          contextColumnNames
+        } = rootGetters.getStoredTab(parentUuid, containerUuid)
+
         if (isEmptyValue(pageNumber)) {
-          // refresh with same page
           pageNumber = storedPage
         }
-        pageToken = generatePageToken({ pageNumber })
+
+        pageToken = generatePageToken({
+          pageNumber
+        })
+
         if (!isEmptyValue(filters) && typeof filters !== 'object') {
           const parseFilter = JSON.parse(filters)
           filters = [parseFilter]
@@ -280,14 +294,12 @@ const windowManager = {
           })
         }
 
-        const {
-          contextColumnNames, name, linkColumnName,
-          parentColumnName, fieldsList, isHasTree
-        } = rootGetters.getStoredTab(parentUuid, containerUuid)
         // add filters with link column name and parent column name
-        if (!isEmptyValue(linkColumnName) &&
+        if (
+          !isEmptyValue(linkColumnName) &&
           !contextColumnNames.includes(linkColumnName) &&
-          !filters.some(filter => filter.columnName === linkColumnName)) {
+          !filters.some(filter => filter.columnName === linkColumnName)
+        ) {
           const value = rootGetters.getValueOfField({
             parentUuid,
             containerUuid,
@@ -302,9 +314,11 @@ const windowManager = {
             console.warn(`Get entities without context to ${linkColumnName} to filter in getEntities`)
           }
         }
-        if (!isEmptyValue(parentColumnName) &&
+        if (
+          !isEmptyValue(parentColumnName) &&
           !contextColumnNames.includes(parentColumnName &&
-          !filters.some(filter => filter.columnName === parentColumnName))) {
+          !filters.some(filter => filter.columnName === parentColumnName))
+        ) {
           const value = rootGetters.getValueOfField({
             parentUuid,
             containerUuid,
@@ -328,6 +342,11 @@ const windowManager = {
         })
 
         const isWithoutValues = contextAttributesList.find(attribute => isEmptyValue(attribute.value))
+
+        if (!isEmptyValue(filtersRecord)) {
+          filters.push(filtersRecord)
+        }
+
         if (isWithoutValues) {
           console.warn(`Get entites without response, fill the **${isWithoutValues.key}** field in **${name}** tab.`)
           resolve([])
@@ -340,18 +359,33 @@ const windowManager = {
           containerUuid
         })
 
-        const currentRoute = router.app._route
-
         commit('setIsLoadingTabRecordsList', {
           containerUuid,
           isLoading: true
         })
-        if (!isEmptyValue(filtersRecord)) {
-          filters.push(filtersRecord)
+
+        if (
+          !isEmptyValue(filters) &&
+          !isEmptyValue(linkColumnName) &&
+          !isEmptyValue(contextAttributesList)
+        ) {
+          const listFilters = filters.find(i => i.columnName === linkColumnName)
+          const listContextAttributes = contextAttributesList.find(i => i.key === linkColumnName)
+          if (
+            !isEmptyValue(listFilters) &&
+            !isEmptyValue(listFilters.value) &&
+            !isEmptyValue(listContextAttributes) &&
+            !isEmptyValue(listContextAttributes.value) &&
+            (listFilters.value !== listContextAttributes.value)
+          ) {
+            filters = []
+          }
         }
+
         if (!isEmptyValue(searchValue)) {
           pageToken = ''
         }
+
         if (isEmptyValue(tabUuid)) {
           tabUuid = containerUuid
         }
@@ -398,6 +432,7 @@ const windowManager = {
               for (const key in ROW_ATTRIBUTES) {
                 delete currentRow[key]
               }
+              const currentRoute = router.app._route
 
               const defaultValues = getters.getParsedDefaultValues({
                 parentUuid,
