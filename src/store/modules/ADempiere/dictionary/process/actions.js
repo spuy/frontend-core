@@ -155,6 +155,9 @@ export default {
         isOverWriteParent: true,
         attributes: defaultAttributes
       })
+      if (isEmptyValue(fieldsList)) {
+        resolve(defaultAttributes)
+      }
 
       fieldsList.forEach(field => {
         // activate logics
