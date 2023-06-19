@@ -463,7 +463,7 @@ const browserControl = {
       // reduce list
       const fieldsListSelection = fieldsList
         .filter(itemField => {
-          return itemField.isIdentifier || !isReadOnlyColumn(itemField)
+          return itemField.isKey || itemField.isIdentifier || !isReadOnlyColumn(itemField)
         })
         .map(itemField => {
           return {
