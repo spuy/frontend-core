@@ -93,6 +93,14 @@ export const OPERATOR_BETWEEN = {
   symbol: '>-<'
 }
 
+export const OPERATOR_NOT_BETWEEN = {
+  operator: 'NOT_BETWEEN',
+  sqlOperators: [
+    'NOT_BETWEEN'
+  ],
+  symbol: '<->'
+}
+
 export const OPERATOR_NULL = {
   operator: 'NULL',
   sqlOperators: [
@@ -158,6 +166,7 @@ export const OPERATORS_LIST = [
   OPERATOR_LESS,
   OPERATOR_LESS_EQUAL,
   OPERATOR_BETWEEN,
+  OPERATOR_NOT_BETWEEN,
   OPERATOR_NOT_NULL,
   OPERATOR_NULL,
   OPERATOR_IN,
@@ -178,7 +187,8 @@ export const OPERATORS_FIELD_DATE = {
   componentPath: 'FieldDate',
   isRange: true,
   operatorsList: [
-    OPERATOR_BETWEEN,
+    OPERATOR_BETWEEN.operator,
+    OPERATOR_NOT_BETWEEN.operator,
     ...STANDARD_OPERATORS_LIST,
     ...RANGE_OPERATORS_LIST,
     ...MULTIPLE_OPERATORS_LIST
