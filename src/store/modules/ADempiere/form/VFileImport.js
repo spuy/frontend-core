@@ -18,7 +18,8 @@
 
 // API Request Methods
 import {
-  getImportFormats
+  getImportFormats,
+  getListImportTables
 } from '@/api/ADempiere/form/VFileImport.js'
 
 // Utils and Helper Methods
@@ -27,12 +28,21 @@ import {
 const VFileImport = {
   attribute: {
     charsets: '',
-    importFormats: ''
+    importFormats: '',
+    tablaId: 0,
+    formatFields: []
   },
   options: {
     listCharsets: [],
-    listImportFormats: []
-  }
+    listImportFormats: [],
+    listTables: []
+  },
+  file: {
+    data: [],
+    header: []
+  },
+  infoFormat: {},
+  navigationLine: {}
 }
 
 export default {
@@ -51,6 +61,16 @@ export default {
       value
     }) {
       state[attribute][criteria] = value
+    },
+    setFile(state, file) {
+      state.file = file
+    },
+    setInfoFormat(state, formats) {
+      state.infoFormat = formats
+    },
+    setNavigationLine(state, line) {
+      console.log({ line })
+      state.navigationLine = line
     }
   },
   actions: {
@@ -62,13 +82,46 @@ export default {
           id
         })
           .then(response => {
-            console.log({ response })
+            commit('updateAttributeVFileImport', {
+              attribute: 'attribute',
+              criteria: 'formatFields',
+              value: response.formatFields
+            })
+            commit('setInfoFormat', response)
             resolve(response)
           })
           .catch(error => {
             console.warn(`Error getting Import Formats: ${error.message}. Code: ${error.code}.`)
             resolve([])
           })
+      })
+    },
+    findListTable({ commit }) {
+      getListImportTables()
+        .then(response => {
+          const { records } = response
+          commit('updateAttributeVFileImport', {
+            attribute: 'options',
+            criteria: 'listTables',
+            value: records
+          })
+        })
+        .catch(error => {
+          console.warn(`Error getting Import Table: ${error.message}. Code: ${error.code}.`)
+          commit('updateAttributeVFileImport', {
+            attribute: 'options',
+            criteria: 'listTables',
+            value: []
+          })
+        })
+    },
+    changeTable({ commit }, {
+      id
+    }) {
+      commit('updateAttributeVFileImport', {
+        attribute: 'attribute',
+        criteria: 'tablaId',
+        value: id
       })
     }
   },
@@ -78,6 +131,15 @@ export default {
     },
     getOptions(state) {
       return state.options
+    },
+    getFile(state) {
+      return state.file
+    },
+    getInfoFormat(state) {
+      return state.infoFormat
+    },
+    getNavigationLine(state) {
+      return state.navigationLine
     }
   }
 }
