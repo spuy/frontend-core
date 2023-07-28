@@ -5,24 +5,29 @@
         <el-tooltip placement="right">
           <div slot="content">{{ getRole.name }} | {{ getRole.clientName }}</div>
           <img v-if="logo" :src="logo" class="sidebar-logo">
-          <h1 v-else class="sidebar-title">{{ title }} </h1>
+          <svg-icon v-else icon-class="AD" style="width: 2em !important;height: 2em !important;font-size: 25px;padding-left: 5px;padding-right: 0px;cursor: pointer;" />
+          <b>{{ title }} </b>
         </el-tooltip>
       </router-link>
-      <div v-else key="expand" class="sidebar-logo-link">
-        <img v-if="logo" :src="logo" class="sidebar-logo" @click="dashboard()">
-        <h1 class="sidebar-title" @click="dashboard()">{{ title }}</h1><br>
+      <span v-else>
+        <p key="expand" style="display: flex;text-align: center;width: 100%;padding: 0px 15px;margin-top: 10px;">
+          <img v-if="logo" :src="logo" class="sidebar-logo" @click="dashboard()">
+          <svg-icon v-else icon-class="AD" style="width: 2em !important;height: 2em !important;font-size: 25px;padding-left: 5px;padding-right: 0px;cursor: pointer;" />
+          <b style="color: white;font-size: 18px;padding-top: 15px;cursor: pointer;" @click="dashboard()">{{ title }}</b><br>
+        </p>
         <el-tooltip placement="right">
           <div slot="content">{{ getRole.name }} | {{ getRole.clientName }}</div>
-          <p class="sidebar-sub-title" @click="profile()">
+          <p class="sidebar-sub-title" style="color: white; font-size: 12px;margin: 0px;margin-top: 10px;" @click="profile()">
             {{ getRole.name }} | {{ getRole.clientName }}
           </p>
         </el-tooltip>
-      </div>
+      </span>
     </transition>
   </div>
 </template>
 
 <script>
+import { getImagePath } from '@/utils/ADempiere/resource.js'
 export default {
   name: 'SidebarLogo',
   props: {
@@ -34,14 +39,28 @@ export default {
   data() {
     return {
       // title: 'Vue Element Admin',
-      title: 'ADempiere Vue',
+      title: 'ADempiere Vue'
       // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
-      logo: 'https://avatars1.githubusercontent.com/u/1263359?s=200&v=4?imageView2/1/w/80/h/80'
+      // logo: 'https://avatars1.githubusercontent.com/u/1263359?s=200&v=4?imageView2/1/w/80/h/80'
     }
   },
   computed: {
     getRole() {
       return this.$store.getters['user/getRole']
+    },
+    logo() {
+      const { clientLogo } = this.getRole
+      if (clientLogo) {
+        const { uri } = getImagePath({
+          file: clientLogo,
+          width: 50,
+          height: 50,
+          operation: 'resize'
+        })
+
+        return uri
+      }
+      return undefined
     }
   },
   methods: {
@@ -72,7 +91,7 @@ export default {
 .sidebar-logo-container {
   position: relative;
   width: 100%;
-  height: 50px;
+  height: 70px;
   // line-height: 50px;
   background: #2b2f3a;
   text-align: center;
@@ -81,10 +100,11 @@ export default {
   & .sidebar-logo-link {
     height: 100%;
     width: 100%;
+    padding-top: 10px;
 
     & .sidebar-logo {
-      width: 32px;
-      height: 32px;
+      // width: 32px;
+      // height: 32px;
       vertical-align: middle;
       margin-right: 12px;
       cursor: pointer;
@@ -108,7 +128,8 @@ export default {
       text-overflow: ellipsis;
       // display: inline-block;
       cursor: pointer;
-      margin: 0;
+      margin-top: 10px;
+      padding-top: 0px;
       color: #fff;
       font-size: 12px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;

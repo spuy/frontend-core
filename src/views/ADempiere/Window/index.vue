@@ -166,6 +166,7 @@ export default defineComponent({
         case 'SO':
         case 'PO':
         case 'T':
+        case 'M':
           windowComponent = () => import('@/views/ADempiere/Window/DocumentWindow.vue')
           break
         case 'MM':
