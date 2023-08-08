@@ -71,6 +71,11 @@ const VAllocation = {
       difference: []
     }
   },
+  listSelectAll: [],
+  isLoadTables: {
+    isLoadingInvoces: false,
+    isLoadingPayments: false
+  },
   steps: 0
 }
 
@@ -163,6 +168,9 @@ export default {
     },
     setDiferenceTotal(state, list) {
       state.paymentAssignment.list.difference = list
+    },
+    setListSelectInvoceandPayment(state, list) {
+      state.listSelectAll = list
     }
   },
   actions: {
@@ -180,6 +188,11 @@ export default {
           transactionType,
           isAutomaticWriteOff
         } = state.searchCriteria
+        commit('updateAttributeCriteriaVallocation', {
+          attribute: 'isLoadingPayments',
+          criteria: 'isLoadTables',
+          value: true
+        })
         listPayments({
           businessPartnerId,
           businessPartnerUuid,
@@ -199,10 +212,16 @@ export default {
                 ...payments,
                 transaction_date: dateTimeFormats(payments.transaction_date, 'YYYY-MM-DD'),
                 applied: 0,
-                isSelect: false
+                isSelect: false,
+                type: 'isPayment'
               }
             })
             commit('setListPayments', list)
+            commit('updateAttributeCriteriaVallocation', {
+              attribute: 'isLoadingPayments',
+              criteria: 'isLoadTables',
+              value: false
+            })
             resolve(list)
           })
           .catch(error => {
@@ -210,6 +229,11 @@ export default {
               type: 'error',
               message: error.message,
               showClose: true
+            })
+            commit('updateAttributeCriteriaVallocation', {
+              attribute: 'isLoadingPayments',
+              criteria: 'isLoadTables',
+              value: false
             })
             resolve([])
             console.warn(`Error getting List Product: ${error.message}. Code: ${error.code}.`)
@@ -230,6 +254,11 @@ export default {
           transactionType,
           isAutomaticWriteOff
         } = state.searchCriteria
+        commit('updateAttributeCriteriaVallocation', {
+          attribute: 'isLoadingInvoces',
+          criteria: 'isLoadTables',
+          value: true
+        })
         listInvoices({
           businessPartnerId,
           businessPartnerUuid,
@@ -250,20 +279,31 @@ export default {
                 date_invoiced: dateTimeFormats(payments.date_invoiced, 'YYYY-MM-DD'),
                 applied: 0,
                 writeOff: 0,
-                isSelect: false
+                isSelect: false,
+                amountApplied: 0,
+                type: 'isInvoce'
               }
+            })
+            commit('updateAttributeCriteriaVallocation', {
+              attribute: 'isLoadingInvoces',
+              criteria: 'isLoadTables',
+              value: false
             })
             commit('setListInvoces', list)
             resolve(list)
           })
           .catch(error => {
-            resolve([])
             showMessage({
               type: 'error',
               message: error.message,
               showClose: true
             })
-            // commit('setListProduct', [])
+            commit('updateAttributeCriteriaVallocation', {
+              attribute: 'isLoadingInvoces',
+              criteria: 'isLoadTables',
+              value: false
+            })
+            resolve([])
             console.warn(`Error getting List Product: ${error.message}. Code: ${error.code}.`)
           })
       })
@@ -361,6 +401,12 @@ export default {
     },
     getAllDiference(state) {
       return state.paymentAssignment.list.difference
+    },
+    getListSelectInvoceandPayment(state) {
+      return state.listSelectAll
+    },
+    getisLoadTables(state) {
+      return state.isLoadTables
     }
   }
 }
