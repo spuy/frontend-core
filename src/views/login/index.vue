@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
       <el-row>
         <el-col :span="3">
-          <img src="https://avatars1.githubusercontent.com/u/1263359?s=200&v=4" class="image">
+          <img src="https://avatars.githubusercontent.com/u/54648828?s=80&v=4" class="image">
         </el-col>
         <el-col :span="20">
           <div class="title-container">

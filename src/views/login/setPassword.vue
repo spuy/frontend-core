@@ -3,7 +3,7 @@
     <el-form ref="changePasswordForm" :rules="passwordResetRules" :model="changePasswordForm" class="login-form" auto-complete="off" label-position="left">
       <el-row>
         <el-col :span="3">
-          <img src="https://avatars1.githubusercontent.com/u/1263359?s=200&v=4" class="image">
+          <img src="https://avatars.githubusercontent.com/u/54648828?s=200&v=4" class="image">
         </el-col>
         <el-col :span="20">
           <div class="title-container">

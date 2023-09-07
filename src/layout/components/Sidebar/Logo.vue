@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import { getImagePath } from '@/utils/ADempiere/resource.js'
 export default {
   name: 'SidebarLogo',
   props: {
@@ -40,7 +39,7 @@ export default {
   data() {
     return {
       // title: 'Vue Element Admin',
-      title: 'ADempiere'
+      title: 'Solop'
       // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
       // logo: 'https://avatars1.githubusercontent.com/u/1263359?s=200&v=4?imageView2/1/w/80/h/80'
     }
@@ -50,18 +49,7 @@ export default {
       return this.$store.getters['user/getRole']
     },
     logo() {
-      const { clientLogo } = this.getRole
-      if (clientLogo) {
-        const { uri } = getImagePath({
-          file: clientLogo,
-          width: 50,
-          height: 50,
-          operation: 'resize'
-        })
-
-        return uri
-      }
-      return undefined
+      return 'https://avatars.githubusercontent.com/u/54648828?s=50'
     }
   },
   methods: {
