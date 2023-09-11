@@ -718,17 +718,10 @@ export function setIconsTableName({
     class: 'search'
   }
   switch (tableName) {
-    case 'C_Order':
-    case 'I_Order':
+    case 'HR_Process':
       icon = {
         type: 'svg',
-        class: 'clipboard'
-      }
-      break
-    case 'C_BPartner':
-      icon = {
-        type: 'svg',
-        class: 'b-partner'
+        class: 'peoples'
       }
       break
     case 'C_Payment':
@@ -736,18 +729,6 @@ export function setIconsTableName({
       icon = {
         type: 'svg',
         class: 'payments'
-      }
-      break
-    case 'M_InOut':
-      icon = {
-        type: 'svg',
-        class: 'local-shipping'
-      }
-      break
-    case 'HR_Process':
-      icon = {
-        type: 'svg',
-        class: 'peoples'
       }
       break
     case 'C_Invoice':
@@ -763,6 +744,7 @@ export function setIconsTableName({
         class: 'account-balance'
       }
       break
+    case 'M_InOut':
     case 'I_InOutLineConfirm':
       icon = {
         type: 'svg',
@@ -775,6 +757,13 @@ export function setIconsTableName({
         class: 'inventory'
       }
       break
+    case 'C_Order':
+    case 'I_Order':
+      icon = {
+        type: 'svg',
+        class: 'clipboard'
+      }
+      break
     case 'I_Conversion_Rate':
       icon = {
         type: 'svg',
@@ -782,14 +771,18 @@ export function setIconsTableName({
       }
       break
     case 'I_Product':
-    case 'M_Product':
-    case 'I_ProductPlanning':
-    case 'I_Product_BOM':
       icon = {
         type: 'svg',
         class: 'product'
       }
       break
+    case 'M_Product':
+      icon = {
+        type: 'svg',
+        class: 'product'
+      }
+      break
+    case 'C_BPartner':
     case 'I_BPartner':
       icon = {
         type: 'i',
@@ -821,7 +814,6 @@ export function setIconsTableName({
       }
       break
     case 'I_Asset':
-    case 'I_FixedAsset':
       icon = {
         type: 'i',
         class: 'el-icon-coin'
@@ -831,6 +823,12 @@ export function setIconsTableName({
       icon = {
         type: 'i',
         class: 'el-icon-truck'
+      }
+      break
+    case 'I_ProductPlanning':
+      icon = {
+        type: 'svg',
+        class: 'product'
       }
       break
     case 'I_PriceList':
@@ -843,6 +841,18 @@ export function setIconsTableName({
       icon = {
         type: 'svg',
         class: 'import-movement'
+      }
+      break
+    case 'I_Product_BOM':
+      icon = {
+        type: 'svg',
+        class: 'product'
+      }
+      break
+    case 'I_FixedAsset':
+      icon = {
+        type: 'i',
+        class: 'el-icon-coin'
       }
       break
     case 'I_HR_Attribute':
@@ -882,7 +892,6 @@ export function setIconsTableName({
       }
       break
     case 'I_Project':
-    case 'C_Project':
       icon = {
         type: 'svg',
         class: 'project'
