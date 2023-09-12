@@ -23,22 +23,50 @@
       :key="taks.id"
       :xs="12"
       :sm="12"
-      :lg="6"
+      :lg="spanSize"
       class="card-panel-col"
     >
       <div class="card-panel" @click="handleClick(taks)">
-        <div :class="taks.classCard">
-          <i
-            v-if="taks.svg.type === 'i'"
-            :class="taks.svg.class"
-            style="font-size: 65px"
-          />
-          <svg-icon
-            v-else
-            :icon-class="taks.svg.class"
-            class-name="card-panel-icon"
-          />
-          <!-- <svg-icon :icon-class="taks.svg" class-name="card-panel-icon" /> -->
+        <div
+          :class="taks.classCard"
+          style="text-align: center;"
+        >
+          <el-badge
+            v-if="isMobile"
+            :value="taks.recordCount"
+            type="primary"
+            class="item"
+          >
+            <i
+              v-if="taks.svg.type === 'i'"
+              :class="taks.svg.class"
+              style="font-size: 65px"
+            />
+            <svg-icon
+              v-else
+              :icon-class="taks.svg.class"
+              class-name="card-panel-icon"
+              style="margin: 0px !important;"
+            />
+          </el-badge>
+          <span v-else>
+            <i
+              v-if="taks.svg.type === 'i'"
+              :class="taks.svg.class"
+              style="font-size: 65px"
+            />
+            <svg-icon
+              v-else
+              :icon-class="taks.svg.class"
+              class-name="card-panel-icon"
+            />
+          </span>
+          <p
+            v-if="isMobile"
+            style="margin: 0px;"
+          >
+            {{ taks.name }}
+          </p>
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
@@ -69,6 +97,18 @@ export default defineComponent({
     CountTo
   },
   setup(props) {
+    const isMobile = computed(() => {
+      return store.state.app.device === 'mobile'
+    })
+
+    const spanSize = computed(() => {
+      const quantity = mainTaks.value.length
+      if (quantity === 1) return 24
+      if (quantity === 2) return 12
+      if (quantity === 3) return 8
+      return 6
+    })
+
     const documentList = computed(() => {
       return store.getters.getListTaks.map(taks => {
         const { criteria } = taks
@@ -128,6 +168,8 @@ export default defineComponent({
     return {
       // Computed
       mainTaks,
+      isMobile,
+      spanSize,
       documentList,
       // Methods
       handleClick,
