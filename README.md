@@ -39,10 +39,10 @@ It is a great UI for [ADempiere ERP, CRM & SCM](https://github.com/adempiere/ade
 
 [adempiere-vue](https://github.com/adempiere/adempiere-vue) use the modern open source high performance RPC framework that can run in any environment [gRPC](https://grpc.io/) as [server](https://github.com/adempiere/adempiere-gRPC-Server).
 
-- [Preview](https://demo-ui.erpya.com/)
+- [Live Preview](https://vue-develop.solopcloud.com/)
 
-  - **User**: demo
-  - **Password**: demo
+  - **User**: `GardenAdmin`
+  - **Password**: `GardenAdmin`
 
 
 - [Documentation](https://adempiere.github.io/adempiere-vue-site/)
@@ -73,15 +73,15 @@ Understanding and learning this knowledge in advance will greatly help the use o
 
 ### For all enviroment you should run the follow images:
 - ADempiere gRPC: https://hub.docker.com/r/erpya/adempiere-grpc-all-in-one
-```shell
+```bash
 docker pull erpya/adempiere-grpc-all-in-one
 ```
 - Proxy ADempiere API: https://hub.docker.com/r/erpya/proxy-adempiere-api
-```shell
+```bash
 docker pull erpya/proxy-adempiere-api
 ```
 - ADempiere Vue: https://hub.docker.com/r/erpya/adempiere-vue
-```shell
+```bash
 docker pull erpya/adempiere-vue
 ```
 
@@ -93,27 +93,27 @@ To use this Docker image you must have your Docker engine release number greater
 than or equal to 3.0.
 
 Build docker image (for development only):
-```shell
-docker build -t erpya/adempiere-vue:dev -f ./Dockerfile .
+```bash
+docker build -t solopcloud/adempiere-vue:dev -f ./Dockerfile .
 ```
 
 Download docker image:
-```shell
-docker pull erpya/adempiere-vue
+```bash
+docker pull solopcloud/adempiere-vue
 ```
 
 Run container container:
-```shell
+```bash
 docker run -it \
 	--name adempiere-vue \
 	-p 80:80 \
 	-e API_URL="http://localhost:8085" \
 	-e TZ="America/Caracas" \
-	erpya/adempiere-vue
+	solopcloud/adempiere-vue
 ```
 
 Or easy run container using `docker-compose` with follow command:
-```shell
+```bash
 docker-compose up
 ```
 
@@ -230,7 +230,7 @@ Use [gRPC ADempiere Server](https://github.com/adempiere/adempiere-gRPC-Server) 
 git config --global url."https://".insteadOf git://
 
 # clone the project
-git clone -b experimental --recursive https://github.com/solop-develop/frontend-core.git
+git clone -b experimental https://github.com/solop-develop/frontend-core.git
 
 # enter the project directory
 cd frontend-core
@@ -279,10 +279,10 @@ Detailed changes for each release are documented in the [release notes](https://
 
 ## Online Demo
 
-[Preview](https://demo-ui.erpya.com)
+[Live Preview](https://vue-develop.solopcloud.com/)
 
-- **User**: demo
-- **Password**: demo
+- **User**: `GardenAdmin`
+- **Password**: `GardenAdmin`
 
 ## Donate
 

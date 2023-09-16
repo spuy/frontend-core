@@ -39,10 +39,10 @@ Este es una gran UI para [ADempiere ERP, CRM & SCM](https://github.com/adempiere
 
 [adempiere-vue](https://github.com/adempiere/adempiere-vue) usa como RPC (Llamado a Procedimientos Remotos)[gRPC](https://grpc.io/) como [server](https://github.com/adempiere/adempiere-gRPC-Server).
 
-- [Vista Prévia de la Aplicación](https://demo-ui.erpya.com/)
+- [Vista Prévia de la Aplicación](https://vue-develop.solopcloud.com/)
 
-  - **User**: demo
-  - **Password**: demo
+  - **Usuario**: `GardenAdmin`
+  - **Contraseña**: `GardenAdmin`
 
 - [Documentación](https://adempiere.github.io/adempiere-vue-site/)
 
@@ -76,27 +76,27 @@ Entendiendo y aprendiendo acerca de lo anterior le ayudará a conocer el proyect
 Para usar la imagen de Docker debes usar la versión 3.0 o superior de Docker.
 
 Construye la Imagen de docker (solo para desarrollo):
-```shell
-docker build -t erpya/adempiere-vue:dev -f ./Dockerfile .
+```bash
+docker build -t solopcloud/adempiere-vue:dev -f ./Dockerfile .
 ```
 
 Descarga de Imagen:
-```shell
-docker pull erpya/adempiere-vue
+```bash
+docker pull solopcloud/adempiere-vue
 ```
 
 Ejecución de Contenedor:
-```shell
+```bash
 docker run -it \
 	--name adempiere-vue \
 	-p 80:80 \
 	-e API_URL="http://localhost:8085" \
 	-e TZ="America/Caracas" \
-	erpya/adempiere-vue
+	solopcloud/adempiere-vue
 ```
 
 O facilmente ejecutar el contenedor usando `docker-compose` con el siguiente comando:
-```shell
+```bash
 docker-compose up
 ```
 
@@ -213,7 +213,7 @@ Use [gRPC ADempiere Server](https://github.com/adempiere/adempiere-gRPC-Server) 
 git config --global url."https://".insteadOf git://
 
 # clone el proyecto
-git clone -b experimental --recursive https://github.com/solop-develop/frontend-core.git
+git clone -b experimental https://github.com/solop-develop/frontend-core.git
 
 # vaya al directorio clonado
 cd frontend-core
@@ -262,10 +262,10 @@ Los cambios detallados por cada liberación se encuentran en [notas de liberaci�
 
 ## Demostración en línea
 
-[Vista Prévia de la Aplicación](https://demo-ui.erpya.com/)
+[Vista Prévia de la Aplicación](https://vue-develop.solopcloud.com/)
 
-  - **User**: demo
-  - **Password**: demo
+  - **Usuario**: `GardenAdmin`
+  - **Contraseña**: `GardenAdmin`
 
 ## Donación
 
