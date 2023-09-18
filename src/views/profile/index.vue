@@ -21,7 +21,11 @@
               <el-tab-pane :label="$t('page.settings.title')" :name="$t('page.settings.title')">
                 <settings />
               </el-tab-pane>
-              <el-tab-pane label="Información de Sistema" name="Información de Sistema">
+              <!-- Info Company -->
+              <el-tab-pane
+                :label="$t('profile.systemInformation.tabLabel')"
+                :name="$t('profile.systemInformation.tabLabel')"
+              >
                 <user-info
                   :show-panel="true"
                 />
