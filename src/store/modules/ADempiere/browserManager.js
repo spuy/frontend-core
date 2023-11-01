@@ -224,8 +224,8 @@ const browserControl = {
             commit('setBrowserData', {
               containerUuid,
               recordsList,
-              recordCount: browserSearchResponse.recordCount,
-              nextPageToken: browserSearchResponse.nextPageToken,
+              recordCount: browserSearchResponse.record_count,
+              nextPageToken: browserSearchResponse.next_page_token,
               pageNumber,
               pageSize,
               isLoaded: true
